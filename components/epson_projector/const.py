@@ -23,3 +23,10 @@ ICON_BRIGHTNESS = "mdi:brightness-6"
 ICON_CONTRAST = "mdi:contrast-box"
 ICON_VOLUME = "mdi:volume-high"
 ICON_MUTE = "mdi:volume-mute"
+
+BRIGHTNESS_MIN = 0
+BRIGHTNESS_MAX = 255
+CONTRAST_MIN = -32
+CONTRAST_MAX = 32
+VOLUME_MIN = 0
+VOLUME_MAX = 20

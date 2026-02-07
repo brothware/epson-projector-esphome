@@ -3,6 +3,7 @@
 #include "esphome/components/number/number.h"
 #include "esphome/core/component.h"
 
+#include "../entity_base.h"
 #include "../epson_projector.h"
 
 namespace esphome::epson_projector {
@@ -13,19 +14,18 @@ enum class NumberType : uint8_t {
   VOLUME,
 };
 
-class EpsonNumber : public number::Number, public Component {
+class EpsonNumber : public number::Number, public Component, public Parented<EpsonProjector> {
  public:
   void setup() override;
   void dump_config() override;
 
-  void set_parent(EpsonProjector *parent) { this->parent_ = parent; }
   void set_number_type(NumberType type) { this->number_type_ = type; }
+
+  void on_state_change();
 
  protected:
   void control(float value) override;
-  void on_state_change();
 
-  EpsonProjector *parent_{nullptr};
   NumberType number_type_{NumberType::BRIGHTNESS};
 };
 

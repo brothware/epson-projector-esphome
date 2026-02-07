@@ -1,18 +1,17 @@
 import esphome.codegen as cg
-import esphome.config_validation as cv
 from esphome.components import select
 from esphome.const import ENTITY_CATEGORY_CONFIG
 
-from . import EpsonProjector, epson_projector_ns
+from . import epson_projector_ns
 from .const import (
     CONF_ASPECT_RATIO,
     CONF_COLOR_MODE,
-    CONF_PROJECTOR_ID,
     CONF_SOURCE,
     ICON_ASPECT,
     ICON_COLOR_MODE,
     ICON_SOURCE,
 )
+from .platform_helpers import get_projector_parent, projector_platform_schema
 
 DEPENDENCIES = ["epson_projector"]
 
@@ -25,20 +24,19 @@ SELECT_TYPES = {
     CONF_ASPECT_RATIO: SelectType.ASPECT_RATIO,
 }
 
-CONFIG_SCHEMA = cv.Schema(
+CONFIG_SCHEMA = projector_platform_schema(
     {
-        cv.GenerateID(CONF_PROJECTOR_ID): cv.use_id(EpsonProjector),
-        cv.Optional(CONF_SOURCE): select.select_schema(
+        CONF_SOURCE: select.select_schema(
             EpsonSelect,
             icon=ICON_SOURCE,
             entity_category=ENTITY_CATEGORY_CONFIG,
         ),
-        cv.Optional(CONF_COLOR_MODE): select.select_schema(
+        CONF_COLOR_MODE: select.select_schema(
             EpsonSelect,
             icon=ICON_COLOR_MODE,
             entity_category=ENTITY_CATEGORY_CONFIG,
         ),
-        cv.Optional(CONF_ASPECT_RATIO): select.select_schema(
+        CONF_ASPECT_RATIO: select.select_schema(
             EpsonSelect,
             icon=ICON_ASPECT,
             entity_category=ENTITY_CATEGORY_CONFIG,
@@ -48,19 +46,10 @@ CONFIG_SCHEMA = cv.Schema(
 
 
 async def to_code(config):
-    parent = await cg.get_variable(config[CONF_PROJECTOR_ID])
+    parent = await get_projector_parent(config)
 
-    if conf := config.get(CONF_SOURCE):
-        sel = await select.new_select(conf, options=[])
-        cg.add(sel.set_parent(parent))
-        cg.add(sel.set_select_type(SelectType.SOURCE))
-
-    if conf := config.get(CONF_COLOR_MODE):
-        sel = await select.new_select(conf, options=[])
-        cg.add(sel.set_parent(parent))
-        cg.add(sel.set_select_type(SelectType.COLOR_MODE))
-
-    if conf := config.get(CONF_ASPECT_RATIO):
-        sel = await select.new_select(conf, options=[])
-        cg.add(sel.set_parent(parent))
-        cg.add(sel.set_select_type(SelectType.ASPECT_RATIO))
+    for key, select_type in SELECT_TYPES.items():
+        if conf := config.get(key):
+            sel = await select.new_select(conf, options=[])
+            cg.add(sel.set_parent(parent))
+            cg.add(sel.set_select_type(select_type))

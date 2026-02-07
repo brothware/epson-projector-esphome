@@ -94,7 +94,7 @@ void EpsonProjector::set_source(const std::string &source_code) {
 }
 
 void EpsonProjector::set_volume(int volume) {
-  int clamped = clamp_value(volume, 0, 20);
+  int clamped = clamp_value(volume, VOLUME_MIN, VOLUME_MAX);
   std::string cmd = build_set_command(CMD_VOLUME, clamped);
   this->send_command(cmd, CommandType::SET, [this, clamped](bool success, const std::string & /*response*/) {
     if (success) {
@@ -105,13 +105,13 @@ void EpsonProjector::set_volume(int volume) {
 }
 
 void EpsonProjector::set_brightness(int brightness) {
-  int clamped = clamp_value(brightness, 0, 255);
+  int clamped = clamp_value(brightness, BRIGHTNESS_MIN, BRIGHTNESS_MAX);
   std::string cmd = build_set_command(CMD_BRIGHTNESS, clamped);
   this->send_command(cmd, CommandType::SET);
 }
 
 void EpsonProjector::set_contrast(int contrast) {
-  int clamped = clamp_value(contrast, -32, 32);
+  int clamped = clamp_value(contrast, CONTRAST_MIN, CONTRAST_MAX);
   std::string cmd = build_set_command(CMD_CONTRAST, clamped);
   this->send_command(cmd, CommandType::SET);
 }

@@ -7,6 +7,7 @@
 #include "esphome/components/select/select.h"
 #include "esphome/core/component.h"
 
+#include "../entity_base.h"
 #include "../epson_projector.h"
 
 namespace esphome::epson_projector {
@@ -17,20 +18,19 @@ enum class SelectType : uint8_t {
   ASPECT_RATIO,
 };
 
-class EpsonSelect : public select::Select, public Component {
+class EpsonSelect : public select::Select, public Component, public Parented<EpsonProjector> {
  public:
   void setup() override;
   void dump_config() override;
 
-  void set_parent(EpsonProjector *parent) { this->parent_ = parent; }
   void set_select_type(SelectType type) { this->select_type_ = type; }
   void set_options_map(const std::map<std::string, std::string> &options_map);
 
- protected:
-  void control(const std::string &value) override;
   void on_state_change();
 
-  EpsonProjector *parent_{nullptr};
+ protected:
+  void control(const std::string &value) override;
+
   SelectType select_type_{SelectType::SOURCE};
   std::map<std::string, std::string> options_map_;
   std::map<std::string, std::string> reverse_map_;

@@ -19,13 +19,9 @@ void EpsonSelect::set_options_map(const std::map<std::string, std::string> &opti
 }
 
 void EpsonSelect::setup() {
-  if (this->parent_ == nullptr) {
-    ESP_LOGE(TAG, "Parent not set");
-    this->mark_failed();
+  if (!setup_entity(this, TAG)) {
     return;
   }
-
-  this->parent_->add_on_state_callback([this]() { this->on_state_change(); });
 }
 
 void EpsonSelect::dump_config() {

@@ -1,10 +1,10 @@
 import esphome.codegen as cg
-import esphome.config_validation as cv
 from esphome.components import binary_sensor
 from esphome.const import DEVICE_CLASS_POWER, ENTITY_CATEGORY_DIAGNOSTIC
 
-from . import EpsonProjector, epson_projector_ns
-from .const import CONF_MUTE, CONF_POWER_STATE, CONF_PROJECTOR_ID, ICON_MUTE, ICON_PROJECTOR
+from . import epson_projector_ns
+from .const import CONF_MUTE, CONF_POWER_STATE, ICON_MUTE, ICON_PROJECTOR
+from .platform_helpers import get_projector_parent, projector_platform_schema
 
 DEPENDENCIES = ["epson_projector"]
 
@@ -18,16 +18,15 @@ SENSOR_TYPES = {
     CONF_MUTE: BinarySensorType.MUTE_STATE,
 }
 
-CONFIG_SCHEMA = cv.Schema(
+CONFIG_SCHEMA = projector_platform_schema(
     {
-        cv.GenerateID(CONF_PROJECTOR_ID): cv.use_id(EpsonProjector),
-        cv.Optional(CONF_POWER_STATE): binary_sensor.binary_sensor_schema(
+        CONF_POWER_STATE: binary_sensor.binary_sensor_schema(
             EpsonBinarySensor,
             device_class=DEVICE_CLASS_POWER,
             icon=ICON_PROJECTOR,
             entity_category=ENTITY_CATEGORY_DIAGNOSTIC,
         ),
-        cv.Optional(CONF_MUTE): binary_sensor.binary_sensor_schema(
+        CONF_MUTE: binary_sensor.binary_sensor_schema(
             EpsonBinarySensor,
             icon=ICON_MUTE,
             entity_category=ENTITY_CATEGORY_DIAGNOSTIC,
@@ -37,7 +36,7 @@ CONFIG_SCHEMA = cv.Schema(
 
 
 async def to_code(config):
-    parent = await cg.get_variable(config[CONF_PROJECTOR_ID])
+    parent = await get_projector_parent(config)
 
     for key, sensor_type in SENSOR_TYPES.items():
         if conf := config.get(key):

@@ -7,13 +7,9 @@ namespace esphome::epson_projector {
 static const char *const TAG = "epson_projector.number";
 
 void EpsonNumber::setup() {
-  if (this->parent_ == nullptr) {
-    ESP_LOGE(TAG, "Parent not set");
-    this->mark_failed();
+  if (!setup_entity(this, TAG)) {
     return;
   }
-
-  this->parent_->add_on_state_callback([this]() { this->on_state_change(); });
 }
 
 void EpsonNumber::dump_config() {

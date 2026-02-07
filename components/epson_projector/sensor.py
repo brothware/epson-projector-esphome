@@ -1,5 +1,4 @@
 import esphome.codegen as cg
-import esphome.config_validation as cv
 from esphome.components import sensor
 from esphome.const import (
     DEVICE_CLASS_DURATION,
@@ -8,8 +7,9 @@ from esphome.const import (
     UNIT_HOUR,
 )
 
-from . import EpsonProjector, epson_projector_ns
-from .const import CONF_ERROR_CODE, CONF_LAMP_HOURS, CONF_PROJECTOR_ID, ICON_ERROR, ICON_LAMP
+from . import epson_projector_ns
+from .const import CONF_ERROR_CODE, CONF_LAMP_HOURS, ICON_ERROR, ICON_LAMP
+from .platform_helpers import get_projector_parent, projector_platform_schema
 
 DEPENDENCIES = ["epson_projector"]
 
@@ -21,10 +21,9 @@ SENSOR_TYPES = {
     CONF_ERROR_CODE: SensorType.ERROR_CODE,
 }
 
-CONFIG_SCHEMA = cv.Schema(
+CONFIG_SCHEMA = projector_platform_schema(
     {
-        cv.GenerateID(CONF_PROJECTOR_ID): cv.use_id(EpsonProjector),
-        cv.Optional(CONF_LAMP_HOURS): sensor.sensor_schema(
+        CONF_LAMP_HOURS: sensor.sensor_schema(
             EpsonSensor,
             unit_of_measurement=UNIT_HOUR,
             icon=ICON_LAMP,
@@ -33,7 +32,7 @@ CONFIG_SCHEMA = cv.Schema(
             state_class=STATE_CLASS_TOTAL_INCREASING,
             entity_category=ENTITY_CATEGORY_DIAGNOSTIC,
         ),
-        cv.Optional(CONF_ERROR_CODE): sensor.sensor_schema(
+        CONF_ERROR_CODE: sensor.sensor_schema(
             EpsonSensor,
             icon=ICON_ERROR,
             accuracy_decimals=0,
@@ -44,7 +43,7 @@ CONFIG_SCHEMA = cv.Schema(
 
 
 async def to_code(config):
-    parent = await cg.get_variable(config[CONF_PROJECTOR_ID])
+    parent = await get_projector_parent(config)
 
     for key, sensor_type in SENSOR_TYPES.items():
         if conf := config.get(key):

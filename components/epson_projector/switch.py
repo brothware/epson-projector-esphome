@@ -1,10 +1,10 @@
 import esphome.codegen as cg
-import esphome.config_validation as cv
 from esphome.components import switch
 from esphome.const import DEVICE_CLASS_SWITCH, ENTITY_CATEGORY_CONFIG
 
-from . import EpsonProjector, epson_projector_ns
-from .const import CONF_MUTE, CONF_POWER, CONF_PROJECTOR_ID, ICON_MUTE, ICON_PROJECTOR
+from . import epson_projector_ns
+from .const import CONF_MUTE, CONF_POWER, ICON_MUTE, ICON_PROJECTOR
+from .platform_helpers import get_projector_parent, projector_platform_schema
 
 DEPENDENCIES = ["epson_projector"]
 
@@ -16,15 +16,14 @@ SWITCH_TYPES = {
     CONF_MUTE: SwitchType.MUTE,
 }
 
-CONFIG_SCHEMA = cv.Schema(
+CONFIG_SCHEMA = projector_platform_schema(
     {
-        cv.GenerateID(CONF_PROJECTOR_ID): cv.use_id(EpsonProjector),
-        cv.Optional(CONF_POWER): switch.switch_schema(
+        CONF_POWER: switch.switch_schema(
             EpsonSwitch,
             device_class=DEVICE_CLASS_SWITCH,
             icon=ICON_PROJECTOR,
         ),
-        cv.Optional(CONF_MUTE): switch.switch_schema(
+        CONF_MUTE: switch.switch_schema(
             EpsonSwitch,
             icon=ICON_MUTE,
             entity_category=ENTITY_CATEGORY_CONFIG,
@@ -34,7 +33,7 @@ CONFIG_SCHEMA = cv.Schema(
 
 
 async def to_code(config):
-    parent = await cg.get_variable(config[CONF_PROJECTOR_ID])
+    parent = await get_projector_parent(config)
 
     for key, switch_type in SWITCH_TYPES.items():
         if conf := config.get(key):
