@@ -1,4 +1,5 @@
 import esphome.codegen as cg
+import esphome.config_validation as cv
 from esphome.components import sensor
 from esphome.const import (
     DEVICE_CLASS_DURATION,
@@ -23,7 +24,7 @@ SENSOR_TYPES = {
 
 CONFIG_SCHEMA = projector_platform_schema(
     {
-        CONF_LAMP_HOURS: sensor.sensor_schema(
+        cv.Optional(CONF_LAMP_HOURS): sensor.sensor_schema(
             EpsonSensor,
             unit_of_measurement=UNIT_HOUR,
             icon=ICON_LAMP,
@@ -32,7 +33,7 @@ CONFIG_SCHEMA = projector_platform_schema(
             state_class=STATE_CLASS_TOTAL_INCREASING,
             entity_category=ENTITY_CATEGORY_DIAGNOSTIC,
         ),
-        CONF_ERROR_CODE: sensor.sensor_schema(
+        cv.Optional(CONF_ERROR_CODE): sensor.sensor_schema(
             EpsonSensor,
             icon=ICON_ERROR,
             accuracy_decimals=0,

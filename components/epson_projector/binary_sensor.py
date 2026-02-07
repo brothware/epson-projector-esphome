@@ -1,4 +1,5 @@
 import esphome.codegen as cg
+import esphome.config_validation as cv
 from esphome.components import binary_sensor
 from esphome.const import DEVICE_CLASS_POWER, ENTITY_CATEGORY_DIAGNOSTIC
 
@@ -18,13 +19,13 @@ SENSOR_TYPES = {
 
 CONFIG_SCHEMA = projector_platform_schema(
     {
-        CONF_POWER_STATE: binary_sensor.binary_sensor_schema(
+        cv.Optional(CONF_POWER_STATE): binary_sensor.binary_sensor_schema(
             EpsonBinarySensor,
             device_class=DEVICE_CLASS_POWER,
             icon=ICON_PROJECTOR,
             entity_category=ENTITY_CATEGORY_DIAGNOSTIC,
         ),
-        CONF_MUTE: binary_sensor.binary_sensor_schema(
+        cv.Optional(CONF_MUTE): binary_sensor.binary_sensor_schema(
             EpsonBinarySensor,
             icon=ICON_MUTE,
             entity_category=ENTITY_CATEGORY_DIAGNOSTIC,

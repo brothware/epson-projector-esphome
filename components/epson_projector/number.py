@@ -58,9 +58,9 @@ NUMBER_CONFIGS = {
 
 CONFIG_SCHEMA = projector_platform_schema(
     {
-        CONF_BRIGHTNESS: _number_schema_with_slider(EpsonNumber, ICON_BRIGHTNESS),
-        CONF_CONTRAST: _number_schema_with_slider(EpsonNumber, ICON_CONTRAST),
-        CONF_VOLUME: _number_schema_with_slider(EpsonNumber, ICON_VOLUME),
+        cv.Optional(CONF_BRIGHTNESS): _number_schema_with_slider(EpsonNumber, ICON_BRIGHTNESS),
+        cv.Optional(CONF_CONTRAST): _number_schema_with_slider(EpsonNumber, ICON_CONTRAST),
+        cv.Optional(CONF_VOLUME): _number_schema_with_slider(EpsonNumber, ICON_VOLUME),
     }
 )
 

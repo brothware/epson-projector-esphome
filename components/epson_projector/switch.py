@@ -1,4 +1,5 @@
 import esphome.codegen as cg
+import esphome.config_validation as cv
 from esphome.components import switch
 from esphome.const import DEVICE_CLASS_SWITCH, ENTITY_CATEGORY_CONFIG
 
@@ -18,12 +19,12 @@ SWITCH_TYPES = {
 
 CONFIG_SCHEMA = projector_platform_schema(
     {
-        CONF_POWER: switch.switch_schema(
+        cv.Optional(CONF_POWER): switch.switch_schema(
             EpsonSwitch,
             device_class=DEVICE_CLASS_SWITCH,
             icon=ICON_PROJECTOR,
         ),
-        CONF_MUTE: switch.switch_schema(
+        cv.Optional(CONF_MUTE): switch.switch_schema(
             EpsonSwitch,
             icon=ICON_MUTE,
             entity_category=ENTITY_CATEGORY_CONFIG,

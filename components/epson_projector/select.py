@@ -1,4 +1,5 @@
 import esphome.codegen as cg
+import esphome.config_validation as cv
 from esphome.components import select
 from esphome.const import ENTITY_CATEGORY_CONFIG
 
@@ -26,17 +27,17 @@ SELECT_TYPES = {
 
 CONFIG_SCHEMA = projector_platform_schema(
     {
-        CONF_SOURCE: select.select_schema(
+        cv.Optional(CONF_SOURCE): select.select_schema(
             EpsonSelect,
             icon=ICON_SOURCE,
             entity_category=ENTITY_CATEGORY_CONFIG,
         ),
-        CONF_COLOR_MODE: select.select_schema(
+        cv.Optional(CONF_COLOR_MODE): select.select_schema(
             EpsonSelect,
             icon=ICON_COLOR_MODE,
             entity_category=ENTITY_CATEGORY_CONFIG,
         ),
-        CONF_ASPECT_RATIO: select.select_schema(
+        cv.Optional(CONF_ASPECT_RATIO): select.select_schema(
             EpsonSelect,
             icon=ICON_ASPECT,
             entity_category=ENTITY_CATEGORY_CONFIG,
