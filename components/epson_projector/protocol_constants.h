@@ -1,7 +1,8 @@
 #pragma once
 
-namespace esphome {
-namespace epson_projector {
+#include <cstdint>
+
+namespace esphome::epson_projector {
 
 static constexpr char CMD_TERMINATOR = '\r';
 static constexpr char RESPONSE_PROMPT = ':';
@@ -46,5 +47,4 @@ enum class PowerState : uint8_t {
   UNKNOWN = 255,
 };
 
-}  // namespace epson_projector
-}  // namespace esphome
+}  // namespace esphome::epson_projector
