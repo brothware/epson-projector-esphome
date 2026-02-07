@@ -1,0 +1,28 @@
+BasedOnStyle: Google
+IndentWidth: 2
+ColumnLimit: 120
+AllowShortFunctionsOnASingleLine: Inline
+AllowShortIfStatementsOnASingleLine: Never
+AllowShortLoopsOnASingleLine: false
+BreakBeforeBraces: Attach
+PointerAlignment: Right
+SpaceAfterCStyleCast: false
+SpaceBeforeAssignmentOperators: true
+SpaceBeforeParens: ControlStatements
+SpaceInEmptyParentheses: false
+SpacesInAngles: false
+SpacesInContainerLiterals: false
+SpacesInParentheses: false
+SpacesInSquareBrackets: false
+Standard: c++17
+UseTab: Never
+DerivePointerAlignment: false
+SortIncludes: true
+IncludeBlocks: Regroup
+IncludeCategories:
+  - Regex: '^"esphome/'
+    Priority: 1
+  - Regex: '^"'
+    Priority: 2
+  - Regex: '^<'
+    Priority: 3
