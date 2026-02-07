@@ -1,0 +1,81 @@
+esphome:
+  name: epson-projector
+  friendly_name: Epson Projector Controller
+
+esp32:
+  board: esp32dev
+
+logger:
+  level: INFO
+
+api:
+  encryption:
+    key: !secret api_key
+
+ota:
+  platform: esphome
+  password: !secret ota_password
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+  ap:
+    ssid: "Epson-Fallback"
+    password: !secret ap_password
+
+external_components:
+  - source: github://brothware/epson-projector-esphome@main
+    components:
+      - epson_projector
+
+uart:
+  id: projector_uart
+  tx_pin: GPIO17
+  rx_pin: GPIO16
+  baud_rate: 9600
+
+epson_projector:
+  id: projector
+  uart_id: projector_uart
+  model: "eh-tw7400"
+  update_interval: 5s
+
+switch:
+  - platform: epson_projector
+    projector_id: projector
+    power:
+      name: "Projector Power"
+    mute:
+      name: "Projector Mute"
+
+binary_sensor:
+  - platform: epson_projector
+    projector_id: projector
+    power_state:
+      name: "Projector Power State"
+
+sensor:
+  - platform: epson_projector
+    projector_id: projector
+    lamp_hours:
+      name: "Lamp Hours"
+    error_code:
+      name: "Error Code"
+
+select:
+  - platform: epson_projector
+    projector_id: projector
+    source:
+      name: "Input Source"
+    color_mode:
+      name: "Color Mode"
+
+number:
+  - platform: epson_projector
+    projector_id: projector
+    brightness:
+      name: "Brightness"
+    contrast:
+      name: "Contrast"
+    volume:
+      name: "Volume"
