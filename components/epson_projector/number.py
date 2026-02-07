@@ -33,9 +33,7 @@ def _number_schema_with_slider(entity_class, icon):
         entity_category=ENTITY_CATEGORY_CONFIG,
     ).extend(
         {
-            cv.Optional(CONF_MODE, default="SLIDER"): cv.enum(
-                number.NUMBER_MODES, upper=True
-            ),
+            cv.Optional(CONF_MODE, default="SLIDER"): cv.enum(number.NUMBER_MODES, upper=True),
         }
     )
 

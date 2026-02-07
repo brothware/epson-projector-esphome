@@ -138,10 +138,7 @@ def _models_from_list(
     factory,
     **kwargs,
 ) -> dict[str, ProjectorModel]:
-    return {
-        f"{prefix}-{num}".lower(): factory(f"Epson {prefix.upper()}-{num}", **kwargs)
-        for num in model_numbers
-    }
+    return {f"{prefix}-{num}".lower(): factory(f"Epson {prefix.upper()}-{num}", **kwargs) for num in model_numbers}
 
 
 PROJECTOR_MODELS: dict[str, ProjectorModel] = {
@@ -160,10 +157,21 @@ PROJECTOR_MODELS: dict[str, ProjectorModel] = {
     **_models_from_list(
         "EH",
         [
-            "TW5000", "TW5100", "TW5200", "TW5210",
-            "TW5300", "TW5350", "TW5400",
-            "TW5600", "TW5650",
-            "TW5700", "TW5705", "TW5720", "TW5725", "TW5820", "TW5825",
+            "TW5000",
+            "TW5100",
+            "TW5200",
+            "TW5210",
+            "TW5300",
+            "TW5350",
+            "TW5400",
+            "TW5600",
+            "TW5650",
+            "TW5700",
+            "TW5705",
+            "TW5720",
+            "TW5725",
+            "TW5820",
+            "TW5825",
         ],
         _home_cinema,
     ),
@@ -173,9 +181,13 @@ PROJECTOR_MODELS: dict[str, ProjectorModel] = {
     **_models_from_list(
         "EH",
         [
-            "TW6000", "TW6100",
-            "TW6150", "TW6250",
-            "TW6600", "TW6700", "TW6800",
+            "TW6000",
+            "TW6100",
+            "TW6150",
+            "TW6250",
+            "TW6600",
+            "TW6700",
+            "TW6800",
         ],
         _home_cinema,
         has_3d=True,
@@ -297,9 +309,18 @@ PROJECTOR_MODELS: dict[str, ProjectorModel] = {
     **_models_from_list(
         "EB",
         [
-            "2040", "2042", "2065",
-            "2140W", "2142W", "2155W", "2165W",
-            "2245U", "2247U", "2250U", "2255U", "2265U",
+            "2040",
+            "2042",
+            "2065",
+            "2140W",
+            "2142W",
+            "2155W",
+            "2165W",
+            "2245U",
+            "2247U",
+            "2250U",
+            "2255U",
+            "2265U",
         ],
         _business,
         sources=SOURCES_BUSINESS_DUAL_HDMI,

@@ -10,18 +10,14 @@ CODEOWNERS = ["@brothware"]
 DEPENDENCIES = ["uart"]
 
 epson_projector_ns = cg.esphome_ns.namespace("epson_projector")
-EpsonProjector = epson_projector_ns.class_(
-    "EpsonProjector", uart.UARTDevice, cg.PollingComponent
-)
+EpsonProjector = epson_projector_ns.class_("EpsonProjector", uart.UARTDevice, cg.PollingComponent)
 
 CONFIG_SCHEMA = cv.All(
     cv.Schema(
         {
             cv.GenerateID(): cv.declare_id(EpsonProjector),
             cv.Required(CONF_MODEL): cv.one_of(*get_model_names(), lower=True),
-            cv.Optional(
-                CONF_UPDATE_INTERVAL, default="5s"
-            ): cv.positive_time_period_milliseconds,
+            cv.Optional(CONF_UPDATE_INTERVAL, default="5s"): cv.positive_time_period_milliseconds,
         }
     )
     .extend(uart.UART_DEVICE_SCHEMA)

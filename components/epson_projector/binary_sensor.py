@@ -8,9 +8,7 @@ from .platform_helpers import get_projector_parent, projector_platform_schema
 
 DEPENDENCIES = ["epson_projector"]
 
-EpsonBinarySensor = epson_projector_ns.class_(
-    "EpsonBinarySensor", binary_sensor.BinarySensor, cg.Component
-)
+EpsonBinarySensor = epson_projector_ns.class_("EpsonBinarySensor", binary_sensor.BinarySensor, cg.Component)
 BinarySensorType = epson_projector_ns.enum("BinarySensorType")
 
 SENSOR_TYPES = {
