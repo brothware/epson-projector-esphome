@@ -1,0 +1,31 @@
+esphome:
+  name: epson-minimal-test
+  friendly_name: Epson Minimal Test
+
+esp32:
+  board: esp32dev
+
+logger:
+  level: DEBUG
+
+external_components:
+  - source:
+      type: local
+      path: ../../components
+
+uart:
+  id: projector_uart
+  tx_pin: GPIO17
+  rx_pin: GPIO16
+  baud_rate: 9600
+
+epson_projector:
+  id: projector
+  uart_id: projector_uart
+  model: "generic"
+
+switch:
+  - platform: epson_projector
+    projector_id: projector
+    power:
+      name: "Power"

@@ -1,0 +1,77 @@
+esphome:
+  name: epson-projector-test
+  friendly_name: Epson Projector Test
+
+esp32:
+  board: esp32dev
+
+logger:
+  level: DEBUG
+
+api:
+  encryption:
+    key: "dGVzdGtleXRlc3RrZXl0ZXN0a2V5dGVzdGtleXRlc3Q="
+
+ota:
+  platform: esphome
+
+wifi:
+  ssid: "TestNetwork"
+  password: "testpassword"
+  ap:
+    ssid: "Epson-Test"
+
+external_components:
+  - source:
+      type: local
+      path: ../../components
+
+uart:
+  id: projector_uart
+  tx_pin: GPIO17
+  rx_pin: GPIO16
+  baud_rate: 9600
+
+epson_projector:
+  id: projector
+  uart_id: projector_uart
+  model: "generic"
+  update_interval: 5s
+
+switch:
+  - platform: epson_projector
+    projector_id: projector
+    power:
+      name: "Projector Power"
+    mute:
+      name: "Projector Mute"
+
+binary_sensor:
+  - platform: epson_projector
+    projector_id: projector
+    power_state:
+      name: "Projector Power State"
+
+sensor:
+  - platform: epson_projector
+    projector_id: projector
+    lamp_hours:
+      name: "Lamp Hours"
+    error_code:
+      name: "Error Code"
+
+select:
+  - platform: epson_projector
+    projector_id: projector
+    source:
+      name: "Input Source"
+
+number:
+  - platform: epson_projector
+    projector_id: projector
+    brightness:
+      name: "Brightness"
+    contrast:
+      name: "Contrast"
+    volume:
+      name: "Volume"
