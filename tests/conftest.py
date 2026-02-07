@@ -1,13 +1,24 @@
-import sys
+import importlib.util
 from pathlib import Path
 
 import pytest
 
-sys.path.insert(0, str(Path(__file__).parent.parent / "components"))
+COMPONENT_DIR = Path(__file__).parent.parent / "components" / "epson_projector"
+
+
+def load_module_directly(name: str):
+    spec = importlib.util.spec_from_file_location(name, COMPONENT_DIR / f"{name}.py")
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
 
 
 @pytest.fixture
 def models():
-    from epson_projector.models import PROJECTOR_MODELS
+    module = load_module_directly("models")
+    return module.PROJECTOR_MODELS
 
-    return PROJECTOR_MODELS
+
+@pytest.fixture
+def models_module():
+    return load_module_directly("models")

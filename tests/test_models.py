@@ -1,6 +1,3 @@
-import pytest
-
-
 def test_generic_model_exists(models):
     assert "generic" in models
 
@@ -36,56 +33,42 @@ def test_source_codes_are_strings(models):
             assert isinstance(source_code, str), f"Model {model_id} source {source_name} code is not a string"
 
 
-def test_get_model_returns_correct_model():
-    from epson_projector.models import get_model
-
-    model = get_model("generic")
+def test_get_model_returns_correct_model(models_module):
+    model = models_module.get_model("generic")
     assert model is not None
     assert model["name"] == "Generic ESC/VP21"
 
 
-def test_get_model_is_case_insensitive():
-    from epson_projector.models import get_model
-
-    model1 = get_model("generic")
-    model2 = get_model("GENERIC")
-    model3 = get_model("Generic")
+def test_get_model_is_case_insensitive(models_module):
+    model1 = models_module.get_model("generic")
+    model2 = models_module.get_model("GENERIC")
+    model3 = models_module.get_model("Generic")
 
     assert model1 == model2 == model3
 
 
-def test_get_model_returns_none_for_unknown():
-    from epson_projector.models import get_model
-
-    model = get_model("unknown-model-xyz")
+def test_get_model_returns_none_for_unknown(models_module):
+    model = models_module.get_model("unknown-model-xyz")
     assert model is None
 
 
-def test_get_sources_for_model():
-    from epson_projector.models import get_sources_for_model
-
-    sources = get_sources_for_model("generic")
+def test_get_sources_for_model(models_module):
+    sources = models_module.get_sources_for_model("generic")
     assert "HDMI1" in sources
     assert sources["HDMI1"] == "30"
 
 
-def test_has_feature():
-    from epson_projector.models import has_feature
-
-    assert has_feature("generic", "power") is True
-    assert has_feature("generic", "nonexistent_feature") is False
+def test_has_feature(models_module):
+    assert models_module.has_feature("generic", "power") is True
+    assert models_module.has_feature("generic", "nonexistent_feature") is False
 
 
-def test_home_cinema_model_has_hdmi():
-    from epson_projector.models import get_sources_for_model
-
-    sources = get_sources_for_model("eh-tw7400")
+def test_home_cinema_model_has_hdmi(models_module):
+    sources = models_module.get_sources_for_model("eh-tw7400")
     assert "HDMI1" in sources
     assert "HDMI2" in sources
 
 
-def test_business_model_has_computer_inputs():
-    from epson_projector.models import get_sources_for_model
-
-    sources = get_sources_for_model("eb-u42")
+def test_business_model_has_computer_inputs(models_module):
+    sources = models_module.get_sources_for_model("eb-u42")
     assert "Computer1" in sources
