@@ -2,9 +2,13 @@
 
 namespace esphome::epson_projector {
 
-void CommandQueue::enqueue(Command cmd) { queue_.push_back(std::move(cmd)); }
+void CommandQueue::enqueue(Command cmd) {
+  queue_.push_back(std::move(cmd));
+}
 
-void CommandQueue::enqueue_priority(Command cmd) { queue_.push_front(std::move(cmd)); }
+void CommandQueue::enqueue_priority(Command cmd) {
+  queue_.push_front(std::move(cmd));
+}
 
 std::optional<Command> CommandQueue::dequeue() {
   if (queue_.empty()) {
@@ -15,18 +19,26 @@ std::optional<Command> CommandQueue::dequeue() {
   return cmd;
 }
 
-bool CommandQueue::empty() const { return queue_.empty(); }
+bool CommandQueue::empty() const {
+  return queue_.empty();
+}
 
-size_t CommandQueue::size() const { return queue_.size(); }
+size_t CommandQueue::size() const {
+  return queue_.size();
+}
 
 void CommandQueue::clear() {
   queue_.clear();
   pending_command_.reset();
 }
 
-void CommandQueue::set_pending(Command cmd) { pending_command_ = std::move(cmd); }
+void CommandQueue::set_pending(Command cmd) {
+  pending_command_ = std::move(cmd);
+}
 
-void CommandQueue::clear_pending() { pending_command_.reset(); }
+void CommandQueue::clear_pending() {
+  pending_command_.reset();
+}
 
 void CommandQueue::retry_pending() {
   if (pending_command_.has_value() && pending_command_->retry_count < Command::MAX_RETRIES) {

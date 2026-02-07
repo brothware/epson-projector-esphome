@@ -41,8 +41,7 @@ void EpsonSwitch::on_state_change() {
   bool state = false;
   switch (this->switch_type_) {
     case SwitchType::POWER:
-      state = this->parent_->power_state() == PowerState::ON ||
-              this->parent_->power_state() == PowerState::WARMUP;
+      state = this->parent_->power_state() == PowerState::ON || this->parent_->power_state() == PowerState::WARMUP;
       break;
     case SwitchType::MUTE:
       state = this->parent_->is_muted();

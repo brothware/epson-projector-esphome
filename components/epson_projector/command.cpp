@@ -1,9 +1,9 @@
 #include "command.h"
 
+#include "protocol_constants.h"
+
 #include <algorithm>
 #include <cctype>
-
-#include "protocol_constants.h"
 
 namespace esphome::epson_projector {
 
@@ -26,9 +26,7 @@ bool is_valid_source_code(const std::string &code) {
   if (code.empty() || code.size() > 4) {
     return false;
   }
-  return std::all_of(code.begin(), code.end(), [](char c) {
-    return std::isxdigit(static_cast<unsigned char>(c));
-  });
+  return std::all_of(code.begin(), code.end(), [](char c) { return std::isxdigit(static_cast<unsigned char>(c)); });
 }
 
 int clamp_value(int value, int min_val, int max_val) {
@@ -64,10 +62,16 @@ std::string build_set_command(const char *cmd, int value) {
   return build_set_command(cmd, std::to_string(value).c_str());
 }
 
-std::string build_power_on_command() { return build_set_command(CMD_POWER, ARG_ON); }
+std::string build_power_on_command() {
+  return build_set_command(CMD_POWER, ARG_ON);
+}
 
-std::string build_power_off_command() { return build_set_command(CMD_POWER, ARG_OFF); }
+std::string build_power_off_command() {
+  return build_set_command(CMD_POWER, ARG_OFF);
+}
 
-std::string build_mute_command(bool mute) { return build_set_command(CMD_MUTE, mute ? ARG_ON : ARG_OFF); }
+std::string build_mute_command(bool mute) {
+  return build_set_command(CMD_MUTE, mute ? ARG_ON : ARG_OFF);
+}
 
 }  // namespace esphome::epson_projector

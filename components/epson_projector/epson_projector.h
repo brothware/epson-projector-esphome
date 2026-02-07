@@ -1,10 +1,5 @@
 #pragma once
 
-#include <cstdint>
-#include <functional>
-#include <string>
-#include <vector>
-
 #include "esphome/components/uart/uart.h"
 #include "esphome/core/component.h"
 
@@ -12,6 +7,11 @@
 #include "command_queue.h"
 #include "protocol_constants.h"
 #include "response_parser.h"
+
+#include <cstdint>
+#include <functional>
+#include <string>
+#include <vector>
 
 namespace esphome::epson_projector {
 

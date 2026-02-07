@@ -1,11 +1,11 @@
 #pragma once
 
+#include "command.h"
+
 #include <cstdint>
 #include <deque>
 #include <functional>
 #include <optional>
-
-#include "command.h"
 
 namespace esphome::epson_projector {
 

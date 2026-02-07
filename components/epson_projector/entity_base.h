@@ -7,7 +7,7 @@ namespace esphome::epson_projector {
 
 class EpsonProjector;
 
-template<typename T>
+template <typename T>
 class Parented {
  public:
   void set_parent(T *parent) { this->parent_ = parent; }
@@ -17,7 +17,7 @@ class Parented {
   T *parent_{nullptr};
 };
 
-template<typename Entity>
+template <typename Entity>
 bool setup_entity(Entity *entity, const char *tag) {
   auto *parent = entity->get_parent();
   if (parent == nullptr) {

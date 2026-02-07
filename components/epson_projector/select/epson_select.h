@@ -1,14 +1,14 @@
 #pragma once
 
-#include <map>
-#include <string>
-#include <vector>
-
 #include "esphome/components/select/select.h"
 #include "esphome/core/component.h"
 
 #include "../entity_base.h"
 #include "../epson_projector.h"
+
+#include <map>
+#include <string>
+#include <vector>
 
 namespace esphome::epson_projector {
 

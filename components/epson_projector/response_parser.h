@@ -1,11 +1,11 @@
 #pragma once
 
+#include "protocol_constants.h"
+
 #include <cstdint>
 #include <optional>
 #include <string>
 #include <variant>
-
-#include "protocol_constants.h"
 
 namespace esphome::epson_projector {
 
@@ -43,9 +43,8 @@ struct ErrorResult {
   std::string message;
 };
 
-using ParseResult =
-    std::variant<PowerResponse, LampResponse, ErrorResponse, SourceResponse, MuteResponse, NumericResponse,
-                 StringResponse, AckResponse, ErrorResult>;
+using ParseResult = std::variant<PowerResponse, LampResponse, ErrorResponse, SourceResponse, MuteResponse,
+                                 NumericResponse, StringResponse, AckResponse, ErrorResult>;
 
 class ResponseParser {
  public:
