@@ -1,7 +1,7 @@
 import esphome.codegen as cg
 import esphome.config_validation as cv
 from esphome.components import switch
-from esphome.const import CONF_ID, DEVICE_CLASS_SWITCH, ENTITY_CATEGORY_CONFIG
+from esphome.const import DEVICE_CLASS_SWITCH, ENTITY_CATEGORY_CONFIG
 
 from . import EpsonProjector, epson_projector_ns
 from .const import CONF_MUTE, CONF_POWER, CONF_PROJECTOR_ID, ICON_MUTE, ICON_PROJECTOR

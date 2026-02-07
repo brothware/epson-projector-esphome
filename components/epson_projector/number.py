@@ -1,7 +1,7 @@
 import esphome.codegen as cg
 import esphome.config_validation as cv
 from esphome.components import number
-from esphome.const import CONF_ID, CONF_MODE, ENTITY_CATEGORY_CONFIG
+from esphome.const import CONF_MODE, ENTITY_CATEGORY_CONFIG
 
 from . import EpsonProjector, epson_projector_ns
 from .const import (

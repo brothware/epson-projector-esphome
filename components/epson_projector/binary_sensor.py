@@ -1,7 +1,7 @@
 import esphome.codegen as cg
 import esphome.config_validation as cv
 from esphome.components import binary_sensor
-from esphome.const import CONF_ID, DEVICE_CLASS_POWER, ENTITY_CATEGORY_DIAGNOSTIC
+from esphome.const import DEVICE_CLASS_POWER, ENTITY_CATEGORY_DIAGNOSTIC
 
 from . import EpsonProjector, epson_projector_ns
 from .const import CONF_MUTE, CONF_POWER_STATE, CONF_PROJECTOR_ID, ICON_MUTE, ICON_PROJECTOR

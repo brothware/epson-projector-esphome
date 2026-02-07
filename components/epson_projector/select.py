@@ -1,7 +1,7 @@
 import esphome.codegen as cg
 import esphome.config_validation as cv
 from esphome.components import select
-from esphome.const import CONF_ID, ENTITY_CATEGORY_CONFIG
+from esphome.const import ENTITY_CATEGORY_CONFIG
 
 from . import EpsonProjector, epson_projector_ns
 from .const import (
@@ -13,7 +13,6 @@ from .const import (
     ICON_COLOR_MODE,
     ICON_SOURCE,
 )
-from .models import get_model, get_sources_for_model
 
 DEPENDENCIES = ["epson_projector"]
 
@@ -46,12 +45,6 @@ CONFIG_SCHEMA = cv.Schema(
         ),
     }
 )
-
-
-def get_parent_model(parent_config):
-    from . import CONF_MODEL
-
-    return parent_config.get(CONF_MODEL, "generic")
 
 
 async def to_code(config):
