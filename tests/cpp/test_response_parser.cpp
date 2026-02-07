@@ -1,6 +1,6 @@
-#include <gtest/gtest.h>
-
 #include "response_parser.h"
+
+#include <gtest/gtest.h>
 
 namespace esphome::epson_projector {
 

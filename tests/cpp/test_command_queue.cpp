@@ -1,6 +1,6 @@
-#include <gtest/gtest.h>
-
 #include "command_queue.h"
+
+#include <gtest/gtest.h>
 
 namespace esphome::epson_projector {
 
@@ -8,9 +8,7 @@ class CommandQueueTest : public ::testing::Test {
  protected:
   CommandQueue queue;
 
-  Command make_command(const std::string &cmd_str) {
-    return Command{cmd_str, CommandType::QUERY, nullptr, 0};
-  }
+  Command make_command(const std::string &cmd_str) { return Command{cmd_str, CommandType::QUERY, nullptr, 0}; }
 };
 
 TEST_F(CommandQueueTest, StartsEmpty) {

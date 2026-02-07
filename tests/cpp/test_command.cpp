@@ -1,6 +1,6 @@
-#include <gtest/gtest.h>
-
 #include "command.h"
+
+#include <gtest/gtest.h>
 
 namespace esphome::epson_projector {
 
