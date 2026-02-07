@@ -17,7 +17,7 @@ from .platform_helpers import get_projector_parent, projector_platform_schema
 DEPENDENCIES = ["epson_projector"]
 
 EpsonSelect = epson_projector_ns.class_("EpsonSelect", select.Select, cg.Component)
-SelectType = epson_projector_ns.enum("SelectType")
+SelectType = epson_projector_ns.enum("SelectType", is_class=True)
 
 SELECT_TYPES = {
     CONF_SOURCE: SelectType.SOURCE,

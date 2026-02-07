@@ -1,6 +1,9 @@
 esphome:
   name: epson-projector-test
   friendly_name: Epson Projector Test
+  platformio_options:
+    build_flags:
+      - "-Werror"
 
 esp32:
   board: esp32dev

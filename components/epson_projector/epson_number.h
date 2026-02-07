@@ -3,8 +3,8 @@
 #include "esphome/components/number/number.h"
 #include "esphome/core/component.h"
 
-#include "../entity_base.h"
-#include "../epson_projector.h"
+#include "entity_base.h"
+#include "epson_projector.h"
 
 namespace esphome::epson_projector {
 

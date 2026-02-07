@@ -10,7 +10,7 @@ from .platform_helpers import get_projector_parent, projector_platform_schema
 DEPENDENCIES = ["epson_projector"]
 
 EpsonSwitch = epson_projector_ns.class_("EpsonSwitch", switch.Switch, cg.Component)
-SwitchType = epson_projector_ns.enum("SwitchType")
+SwitchType = epson_projector_ns.enum("SwitchType", is_class=True)
 
 SWITCH_TYPES = {
     CONF_POWER: SwitchType.POWER,

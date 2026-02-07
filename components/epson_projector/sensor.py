@@ -15,7 +15,7 @@ from .platform_helpers import get_projector_parent, projector_platform_schema
 DEPENDENCIES = ["epson_projector"]
 
 EpsonSensor = epson_projector_ns.class_("EpsonSensor", sensor.Sensor, cg.Component)
-SensorType = epson_projector_ns.enum("SensorType")
+SensorType = epson_projector_ns.enum("SensorType", is_class=True)
 
 SENSOR_TYPES = {
     CONF_LAMP_HOURS: SensorType.LAMP_HOURS,

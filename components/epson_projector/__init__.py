@@ -12,7 +12,7 @@ DEPENDENCIES = ["uart"]
 epson_projector_ns = cg.esphome_ns.namespace("epson_projector")
 EpsonProjector = epson_projector_ns.class_("EpsonProjector", uart.UARTDevice, cg.PollingComponent)
 
-CONFIG_SCHEMA = cv.All(
+CONFIG_SCHEMA = (
     cv.Schema(
         {
             cv.GenerateID(): cv.declare_id(EpsonProjector),
@@ -21,8 +21,7 @@ CONFIG_SCHEMA = cv.All(
         }
     )
     .extend(uart.UART_DEVICE_SCHEMA)
-    .extend(cv.polling_component_schema("5s")),
-    cv.only_with_arduino,
+    .extend(cv.polling_component_schema("5s"))
 )
 
 

@@ -1,5 +1,6 @@
 #include "epson_select.h"
 
+#include "esphome/core/helpers.h"
 #include "esphome/core/log.h"
 
 namespace esphome::epson_projector {
@@ -9,13 +10,19 @@ static const char *const TAG = "epson_projector.select";
 void EpsonSelect::set_options_map(const std::map<std::string, std::string> &options_map) {
   this->options_map_ = options_map;
   this->reverse_map_.clear();
+  this->option_names_.clear();
 
-  std::vector<std::string> options;
   for (const auto &[name, code] : options_map) {
-    options.push_back(name);
+    this->option_names_.push_back(name);
     this->reverse_map_[code] = name;
   }
-  this->traits.set_options(options);
+
+  FixedVector<const char *> option_ptrs;
+  option_ptrs.init(this->option_names_.size());
+  for (const auto &name : this->option_names_) {
+    option_ptrs.push_back(name.c_str());
+  }
+  this->traits.set_options(option_ptrs);
 }
 
 void EpsonSelect::setup() {

@@ -23,7 +23,7 @@ from .platform_helpers import get_projector_parent, projector_platform_schema
 DEPENDENCIES = ["epson_projector"]
 
 EpsonNumber = epson_projector_ns.class_("EpsonNumber", number.Number, cg.Component)
-NumberType = epson_projector_ns.enum("NumberType")
+NumberType = epson_projector_ns.enum("NumberType", is_class=True)
 
 
 def _number_schema_with_slider(entity_class, icon):
@@ -38,22 +38,16 @@ def _number_schema_with_slider(entity_class, icon):
     )
 
 
-NUMBER_CONFIGS = {
-    CONF_BRIGHTNESS: {
-        "type": NumberType.BRIGHTNESS,
-        "min": BRIGHTNESS_MIN,
-        "max": BRIGHTNESS_MAX,
-    },
-    CONF_CONTRAST: {
-        "type": NumberType.CONTRAST,
-        "min": CONTRAST_MIN,
-        "max": CONTRAST_MAX,
-    },
-    CONF_VOLUME: {
-        "type": NumberType.VOLUME,
-        "min": VOLUME_MIN,
-        "max": VOLUME_MAX,
-    },
+NUMBER_TYPES = {
+    CONF_BRIGHTNESS: NumberType.BRIGHTNESS,
+    CONF_CONTRAST: NumberType.CONTRAST,
+    CONF_VOLUME: NumberType.VOLUME,
+}
+
+NUMBER_RANGES = {
+    CONF_BRIGHTNESS: {"min": BRIGHTNESS_MIN, "max": BRIGHTNESS_MAX},
+    CONF_CONTRAST: {"min": CONTRAST_MIN, "max": CONTRAST_MAX},
+    CONF_VOLUME: {"min": VOLUME_MIN, "max": VOLUME_MAX},
 }
 
 CONFIG_SCHEMA = projector_platform_schema(
@@ -68,13 +62,14 @@ CONFIG_SCHEMA = projector_platform_schema(
 async def to_code(config):
     parent = await get_projector_parent(config)
 
-    for key, number_config in NUMBER_CONFIGS.items():
+    for key, number_type in NUMBER_TYPES.items():
         if conf := config.get(key):
+            ranges = NUMBER_RANGES[key]
             num = await number.new_number(
                 conf,
-                min_value=number_config["min"],
-                max_value=number_config["max"],
+                min_value=ranges["min"],
+                max_value=ranges["max"],
                 step=1,
             )
             cg.add(num.set_parent(parent))
-            cg.add(num.set_number_type(number_config["type"]))
+            cg.add(num.set_number_type(number_type))
