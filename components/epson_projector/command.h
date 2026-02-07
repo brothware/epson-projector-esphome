@@ -19,6 +19,10 @@ struct Command {
   static constexpr uint8_t MAX_RETRIES = 3;
 };
 
+std::string sanitize_value(const std::string &value);
+bool is_valid_source_code(const std::string &code);
+int clamp_value(int value, int min_val, int max_val);
+
 std::string build_query_command(const char *cmd);
 std::string build_set_command(const char *cmd, const char *value);
 std::string build_set_command(const char *cmd, int value);

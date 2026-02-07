@@ -54,4 +54,85 @@ TEST(CommandTest, BuildBrightnessCommand) {
   EXPECT_EQ(cmd, "BRIGHT 128\r");
 }
 
+TEST(SanitizeTest, RemovesCarriageReturn) {
+  std::string result = sanitize_value("test\rvalue");
+  EXPECT_EQ(result, "testvalue");
+}
+
+TEST(SanitizeTest, RemovesNewline) {
+  std::string result = sanitize_value("test\nvalue");
+  EXPECT_EQ(result, "testvalue");
+}
+
+TEST(SanitizeTest, RemovesColon) {
+  std::string result = sanitize_value("test:value");
+  EXPECT_EQ(result, "testvalue");
+}
+
+TEST(SanitizeTest, RemovesControlCharacters) {
+  std::string result = sanitize_value("test\x01\x02value");
+  EXPECT_EQ(result, "testvalue");
+}
+
+TEST(SanitizeTest, PreservesNormalCharacters) {
+  std::string result = sanitize_value("ON");
+  EXPECT_EQ(result, "ON");
+}
+
+TEST(SanitizeTest, PreservesNumbers) {
+  std::string result = sanitize_value("30");
+  EXPECT_EQ(result, "30");
+}
+
+TEST(SanitizeTest, CommandInjectionPrevented) {
+  std::string result = sanitize_value("30\rPWR OFF\r");
+  EXPECT_EQ(result, "30PWR OFF");
+}
+
+TEST(ValidSourceTest, ValidHexCodes) {
+  EXPECT_TRUE(is_valid_source_code("30"));
+  EXPECT_TRUE(is_valid_source_code("A0"));
+  EXPECT_TRUE(is_valid_source_code("10"));
+  EXPECT_TRUE(is_valid_source_code("53"));
+}
+
+TEST(ValidSourceTest, InvalidEmpty) {
+  EXPECT_FALSE(is_valid_source_code(""));
+}
+
+TEST(ValidSourceTest, InvalidTooLong) {
+  EXPECT_FALSE(is_valid_source_code("12345"));
+}
+
+TEST(ValidSourceTest, InvalidNonHex) {
+  EXPECT_FALSE(is_valid_source_code("GH"));
+  EXPECT_FALSE(is_valid_source_code("XX"));
+}
+
+TEST(ValidSourceTest, InvalidWithSpecialChars) {
+  EXPECT_FALSE(is_valid_source_code("3\r"));
+  EXPECT_FALSE(is_valid_source_code("A:"));
+}
+
+TEST(ClampTest, ClampsToMin) {
+  EXPECT_EQ(clamp_value(-50, 0, 255), 0);
+  EXPECT_EQ(clamp_value(-100, -32, 32), -32);
+}
+
+TEST(ClampTest, ClampsToMax) {
+  EXPECT_EQ(clamp_value(300, 0, 255), 255);
+  EXPECT_EQ(clamp_value(100, -32, 32), 32);
+}
+
+TEST(ClampTest, PreservesValidValues) {
+  EXPECT_EQ(clamp_value(128, 0, 255), 128);
+  EXPECT_EQ(clamp_value(0, -32, 32), 0);
+  EXPECT_EQ(clamp_value(-10, -32, 32), -10);
+}
+
+TEST(CommandTest, EmptyValueReturnsEmpty) {
+  std::string cmd = build_set_command("SOURCE", "\r\n");
+  EXPECT_EQ(cmd, "");
+}
+
 }  // namespace esphome::epson_projector

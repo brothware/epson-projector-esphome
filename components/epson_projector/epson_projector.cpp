@@ -77,7 +77,14 @@ void EpsonProjector::set_mute(bool mute) {
 }
 
 void EpsonProjector::set_source(const std::string &source_code) {
+  if (!is_valid_source_code(source_code)) {
+    ESP_LOGW(TAG, "Invalid source code: %s", source_code.c_str());
+    return;
+  }
   std::string cmd = build_set_command(CMD_SOURCE, source_code.c_str());
+  if (cmd.empty()) {
+    return;
+  }
   this->send_command(cmd, CommandType::SET, [this, source_code](bool success, const std::string & /*response*/) {
     if (success) {
       this->current_source_ = source_code;
@@ -87,22 +94,25 @@ void EpsonProjector::set_source(const std::string &source_code) {
 }
 
 void EpsonProjector::set_volume(int volume) {
-  std::string cmd = build_set_command(CMD_VOLUME, volume);
-  this->send_command(cmd, CommandType::SET, [this, volume](bool success, const std::string & /*response*/) {
+  int clamped = clamp_value(volume, 0, 20);
+  std::string cmd = build_set_command(CMD_VOLUME, clamped);
+  this->send_command(cmd, CommandType::SET, [this, clamped](bool success, const std::string & /*response*/) {
     if (success) {
-      this->volume_ = volume;
+      this->volume_ = clamped;
       this->notify_state_change();
     }
   });
 }
 
 void EpsonProjector::set_brightness(int brightness) {
-  std::string cmd = build_set_command(CMD_BRIGHTNESS, brightness);
+  int clamped = clamp_value(brightness, 0, 255);
+  std::string cmd = build_set_command(CMD_BRIGHTNESS, clamped);
   this->send_command(cmd, CommandType::SET);
 }
 
 void EpsonProjector::set_contrast(int contrast) {
-  std::string cmd = build_set_command(CMD_CONTRAST, contrast);
+  int clamped = clamp_value(contrast, -32, 32);
+  std::string cmd = build_set_command(CMD_CONTRAST, clamped);
   this->send_command(cmd, CommandType::SET);
 }
 
