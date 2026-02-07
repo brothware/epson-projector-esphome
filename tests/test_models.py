@@ -72,3 +72,14 @@ def test_home_cinema_model_has_hdmi(models_module):
 def test_business_model_has_computer_inputs(models_module):
     sources = models_module.get_sources_for_model("eb-u42")
     assert "Computer1" in sources
+
+
+def test_eh_tw7100_model(models_module):
+    model = models_module.get_model("eh-tw7100")
+    assert model is not None
+    assert model["name"] == "Epson EH-TW7100"
+    assert model["category"] == "home_cinema"
+    assert "HDMI1" in model["sources"]
+    assert "HDMI2" in model["sources"]
+    assert model["features"]["power"] is True
+    assert model["features"]["luminance"] is True
