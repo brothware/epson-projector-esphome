@@ -12,6 +12,7 @@
 #include <cstdint>
 #include <functional>
 #include <string>
+#include <utility>
 #include <vector>
 
 namespace esphome::epson_projector {
@@ -72,8 +73,10 @@ class EpsonProjector : public uart::UARTDevice, public PollingComponent {
   using StateCallback = std::function<void()>;
   void add_on_state_callback(StateCallback callback) { state_callbacks_.push_back(std::move(callback)); }
 
-  void register_query(QueryType type) { registered_queries_ |= (1 << static_cast<uint32_t>(type)); }
-  bool has_query(QueryType type) const { return (registered_queries_ & (1 << static_cast<uint32_t>(type))) != 0; }
+  void register_query(QueryType type) { registered_queries_ |= (1 << std::to_underlying(type)); }
+  [[nodiscard]] bool has_query(QueryType type) const {
+    return (registered_queries_ & (1 << std::to_underlying(type))) != 0;
+  }
 
  protected:
   void send_command(const std::string &cmd, CommandType type,

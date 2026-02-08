@@ -2,6 +2,10 @@
 
 #include "esphome/core/log.h"
 
+#include <algorithm>
+#include <ranges>
+#include <utility>
+
 namespace esphome::epson_projector {
 
 static const char *const TAG = "epson_projector";
@@ -69,20 +73,17 @@ bool EpsonProjector::is_busy_state() const {
 
 void EpsonProjector::update() {
   bool is_on = (this->power_state_ == PowerState::ON);
-  for (const auto &info : QUERY_TABLE) {
-    if (!this->has_query(info.type)) {
-      continue;
-    }
-    if (info.requires_power_on && !is_on) {
-      continue;
-    }
+  auto should_query = [this, is_on](const QueryInfo &info) {
+    return this->has_query(info.type) && (!info.requires_power_on || is_on);
+  };
+  for (const auto &info : QUERY_TABLE | std::views::filter(should_query)) {
     this->query(info.type);
   }
 }
 
 void EpsonProjector::dump_config() {
   ESP_LOGCONFIG(TAG, "Epson Projector:");
-  ESP_LOGCONFIG(TAG, "  Power State: %d", static_cast<int>(this->power_state_));
+  ESP_LOGCONFIG(TAG, "  Power State: %d", std::to_underlying(this->power_state_));
   ESP_LOGCONFIG(TAG, "  Lamp Hours: %u", this->lamp_hours_);
 }
 
@@ -239,7 +240,7 @@ void EpsonProjector::set_freeze(bool freeze) {
 void EpsonProjector::query(QueryType type) {
   const QueryInfo *info = find_query_info(type);
   if (info == nullptr) {
-    ESP_LOGW(TAG, "Unknown query type: %d", static_cast<int>(type));
+    ESP_LOGW(TAG, "Unknown query type: %d", std::to_underlying(type));
     return;
   }
   std::string cmd = build_query_command(info->cmd);
@@ -267,20 +268,24 @@ void EpsonProjector::process_queue() {
 
 void EpsonProjector::handle_response(const std::string &response) {
   auto result = this->response_parser_.parse(response);
-  if (!result.has_value()) {
-    ESP_LOGW(TAG, "Failed to parse response: %s", response.c_str());
+  if (!result) {
+    ESP_LOGW(TAG, "Parse error: %s", result.error().c_str());
+    auto &pending = this->command_queue_.pending_command();
+    if (pending && pending->callback) {
+      pending->callback(false, response);
+    }
+    this->command_queue_.clear_pending();
     return;
   }
   ESP_LOGD(TAG, "Parsed response successfully");
 
-  bool success = true;
   auto &pending = this->command_queue_.pending_command();
 
   std::visit(
-      [this, &success](auto &&arg) {
+      [this](auto &&arg) {
         using T = std::decay_t<decltype(arg)>;
         if constexpr (std::is_same_v<T, PowerResponse>) {
-          ESP_LOGD(TAG, "Power state: %d -> %d", static_cast<int>(this->power_state_), static_cast<int>(arg.state));
+          ESP_LOGD(TAG, "Power state: %d -> %d", std::to_underlying(this->power_state_), std::to_underlying(arg.state));
           this->power_state_ = arg.state;
           this->notify_state_change();
         } else if constexpr (std::is_same_v<T, LampResponse>) {
@@ -370,24 +375,19 @@ void EpsonProjector::handle_response(const std::string &response) {
           ESP_LOGD(TAG, "Numeric response: %d", arg.value);
         } else if constexpr (std::is_same_v<T, AckResponse>) {
           ESP_LOGD(TAG, "Command acknowledged");
-        } else if constexpr (std::is_same_v<T, ErrorResult>) {
-          ESP_LOGW(TAG, "Error: %s", arg.message.c_str());
-          success = false;
         }
       },
       *result);
 
   if (pending && pending->callback) {
-    pending->callback(success, response);
+    pending->callback(true, response);
   }
   this->command_queue_.clear_pending();
 }
 
 void EpsonProjector::notify_state_change() {
   ESP_LOGV(TAG, "Notifying %d callbacks", this->state_callbacks_.size());
-  for (auto &callback : this->state_callbacks_) {
-    callback();
-  }
+  std::ranges::for_each(this->state_callbacks_, [](auto &cb) { cb(); });
 }
 
 }  // namespace esphome::epson_projector
