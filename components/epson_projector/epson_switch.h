@@ -4,17 +4,10 @@
 #include "esphome/core/component.h"
 
 #include "entity_base.h"
+#include "entity_metadata.h"
 #include "epson_projector.h"
 
 namespace esphome::epson_projector {
-
-enum class SwitchType : uint8_t {
-  POWER,
-  MUTE,
-  H_REVERSE,
-  V_REVERSE,
-  FREEZE,
-};
 
 class EpsonSwitch : public switch_::Switch, public Component, public Parented<EpsonProjector> {
  public:

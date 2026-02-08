@@ -11,29 +11,17 @@ void EpsonBinarySensor::setup() {
   if (!setup_entity(this, TAG)) {
     return;
   }
-  switch (this->sensor_type_) {
-    case BinarySensorType::POWER_STATE:
-      this->parent_->register_query(QueryType::POWER);
-      break;
-    case BinarySensorType::MUTE_STATE:
-      this->parent_->register_query(QueryType::MUTE);
-      break;
+  const auto *info = find_binary_sensor_type_info(this->sensor_type_);
+  if (info != nullptr) {
+    this->parent_->register_query(info->query_type);
   }
   ESP_LOGD(TAG, "Binary sensor setup complete, callback registered");
 }
 
 void EpsonBinarySensor::dump_config() {
   LOG_BINARY_SENSOR("", "Epson Projector Binary Sensor", this);
-  const char *type_str = "Unknown";
-  switch (this->sensor_type_) {
-    case BinarySensorType::POWER_STATE:
-      type_str = "Power State";
-      break;
-    case BinarySensorType::MUTE_STATE:
-      type_str = "Mute State";
-      break;
-  }
-  ESP_LOGCONFIG(TAG, "  Type: %s", type_str);
+  const auto *info = find_binary_sensor_type_info(this->sensor_type_);
+  ESP_LOGCONFIG(TAG, "  Type: %s", info != nullptr ? info->name : "Unknown");
 }
 
 void EpsonBinarySensor::on_state_change() {

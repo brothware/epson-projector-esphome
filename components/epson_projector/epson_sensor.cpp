@@ -11,29 +11,17 @@ void EpsonSensor::setup() {
   if (!setup_entity(this, TAG)) {
     return;
   }
-  switch (this->sensor_type_) {
-    case SensorType::LAMP_HOURS:
-      this->parent_->register_query(QueryType::LAMP_HOURS);
-      break;
-    case SensorType::ERROR_CODE:
-      this->parent_->register_query(QueryType::ERROR_CODE);
-      break;
+  const auto *info = find_sensor_type_info(this->sensor_type_);
+  if (info != nullptr) {
+    this->parent_->register_query(info->query_type);
   }
   ESP_LOGD(TAG, "Sensor setup complete, callback registered");
 }
 
 void EpsonSensor::dump_config() {
   LOG_SENSOR("", "Epson Projector Sensor", this);
-  const char *type_str = "Unknown";
-  switch (this->sensor_type_) {
-    case SensorType::LAMP_HOURS:
-      type_str = "Lamp Hours";
-      break;
-    case SensorType::ERROR_CODE:
-      type_str = "Error Code";
-      break;
-  }
-  ESP_LOGCONFIG(TAG, "  Type: %s", type_str);
+  const auto *info = find_sensor_type_info(this->sensor_type_);
+  ESP_LOGCONFIG(TAG, "  Type: %s", info != nullptr ? info->name : "Unknown");
 }
 
 void EpsonSensor::on_state_change() {

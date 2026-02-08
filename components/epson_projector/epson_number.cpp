@@ -10,70 +10,16 @@ void EpsonNumber::setup() {
   if (!setup_entity(this, TAG)) {
     return;
   }
-  switch (this->number_type_) {
-    case NumberType::BRIGHTNESS:
-      this->parent_->register_query(QueryType::BRIGHTNESS);
-      break;
-    case NumberType::CONTRAST:
-      this->parent_->register_query(QueryType::CONTRAST);
-      break;
-    case NumberType::VOLUME:
-      this->parent_->register_query(QueryType::VOLUME);
-      break;
-    case NumberType::SHARPNESS:
-      this->parent_->register_query(QueryType::SHARPNESS);
-      break;
-    case NumberType::DENSITY:
-      this->parent_->register_query(QueryType::DENSITY);
-      break;
-    case NumberType::TINT:
-      this->parent_->register_query(QueryType::TINT);
-      break;
-    case NumberType::COLOR_TEMPERATURE:
-      this->parent_->register_query(QueryType::COLOR_TEMP);
-      break;
-    case NumberType::V_KEYSTONE:
-      this->parent_->register_query(QueryType::V_KEYSTONE);
-      break;
-    case NumberType::H_KEYSTONE:
-      this->parent_->register_query(QueryType::H_KEYSTONE);
-      break;
+  const auto *info = find_number_type_info(this->number_type_);
+  if (info != nullptr) {
+    this->parent_->register_query(info->query_type);
   }
 }
 
 void EpsonNumber::dump_config() {
   LOG_NUMBER("", "Epson Projector Number", this);
-  const char *type_str = "Unknown";
-  switch (this->number_type_) {
-    case NumberType::BRIGHTNESS:
-      type_str = "Brightness";
-      break;
-    case NumberType::CONTRAST:
-      type_str = "Contrast";
-      break;
-    case NumberType::VOLUME:
-      type_str = "Volume";
-      break;
-    case NumberType::SHARPNESS:
-      type_str = "Sharpness";
-      break;
-    case NumberType::DENSITY:
-      type_str = "Density";
-      break;
-    case NumberType::TINT:
-      type_str = "Tint";
-      break;
-    case NumberType::COLOR_TEMPERATURE:
-      type_str = "Color Temperature";
-      break;
-    case NumberType::V_KEYSTONE:
-      type_str = "V Keystone";
-      break;
-    case NumberType::H_KEYSTONE:
-      type_str = "H Keystone";
-      break;
-  }
-  ESP_LOGCONFIG(TAG, "  Type: %s", type_str);
+  const auto *info = find_number_type_info(this->number_type_);
+  ESP_LOGCONFIG(TAG, "  Type: %s", info != nullptr ? info->name : "Unknown");
 }
 
 void EpsonNumber::control(float value) {

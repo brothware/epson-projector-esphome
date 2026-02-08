@@ -4,21 +4,10 @@
 #include "esphome/core/component.h"
 
 #include "entity_base.h"
+#include "entity_metadata.h"
 #include "epson_projector.h"
 
 namespace esphome::epson_projector {
-
-enum class NumberType : uint8_t {
-  BRIGHTNESS,
-  CONTRAST,
-  VOLUME,
-  SHARPNESS,
-  DENSITY,
-  TINT,
-  COLOR_TEMPERATURE,
-  V_KEYSTONE,
-  H_KEYSTONE,
-};
 
 class EpsonNumber : public number::Number, public Component, public Parented<EpsonProjector> {
  public:

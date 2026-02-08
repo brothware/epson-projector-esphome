@@ -4,14 +4,10 @@
 #include "esphome/core/component.h"
 
 #include "entity_base.h"
+#include "entity_metadata.h"
 #include "epson_projector.h"
 
 namespace esphome::epson_projector {
-
-enum class SensorType : uint8_t {
-  LAMP_HOURS,
-  ERROR_CODE,
-};
 
 class EpsonSensor : public sensor::Sensor, public Component, public Parented<EpsonProjector> {
  public:

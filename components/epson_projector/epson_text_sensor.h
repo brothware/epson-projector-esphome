@@ -4,13 +4,10 @@
 #include "esphome/core/component.h"
 
 #include "entity_base.h"
+#include "entity_metadata.h"
 #include "epson_projector.h"
 
 namespace esphome::epson_projector {
-
-enum class TextSensorType : uint8_t {
-  SERIAL_NUMBER,
-};
 
 class EpsonTextSensor : public text_sensor::TextSensor, public Component, public Parented<EpsonProjector> {
  public:

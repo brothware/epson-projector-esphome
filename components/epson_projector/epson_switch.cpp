@@ -10,46 +10,16 @@ void EpsonSwitch::setup() {
   if (!setup_entity(this, TAG)) {
     return;
   }
-  switch (this->switch_type_) {
-    case SwitchType::POWER:
-      this->parent_->register_query(QueryType::POWER);
-      break;
-    case SwitchType::MUTE:
-      this->parent_->register_query(QueryType::MUTE);
-      break;
-    case SwitchType::H_REVERSE:
-      this->parent_->register_query(QueryType::H_REVERSE);
-      break;
-    case SwitchType::V_REVERSE:
-      this->parent_->register_query(QueryType::V_REVERSE);
-      break;
-    case SwitchType::FREEZE:
-      this->parent_->register_query(QueryType::FREEZE);
-      break;
+  const auto *info = find_switch_type_info(this->switch_type_);
+  if (info != nullptr) {
+    this->parent_->register_query(info->query_type);
   }
 }
 
 void EpsonSwitch::dump_config() {
   LOG_SWITCH("", "Epson Projector Switch", this);
-  const char *type_str = "Unknown";
-  switch (this->switch_type_) {
-    case SwitchType::POWER:
-      type_str = "Power";
-      break;
-    case SwitchType::MUTE:
-      type_str = "Mute";
-      break;
-    case SwitchType::H_REVERSE:
-      type_str = "H Reverse";
-      break;
-    case SwitchType::V_REVERSE:
-      type_str = "V Reverse";
-      break;
-    case SwitchType::FREEZE:
-      type_str = "Freeze";
-      break;
-  }
-  ESP_LOGCONFIG(TAG, "  Type: %s", type_str);
+  const auto *info = find_switch_type_info(this->switch_type_);
+  ESP_LOGCONFIG(TAG, "  Type: %s", info != nullptr ? info->name : "Unknown");
 }
 
 void EpsonSwitch::write_state(bool state) {

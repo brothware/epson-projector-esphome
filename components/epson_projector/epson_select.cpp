@@ -24,22 +24,9 @@ void EpsonSelect::setup() {
     return;
   }
 
-  switch (this->select_type_) {
-    case SelectType::SOURCE:
-      this->parent_->register_query(QueryType::SOURCE);
-      break;
-    case SelectType::COLOR_MODE:
-      this->parent_->register_query(QueryType::COLOR_MODE);
-      break;
-    case SelectType::ASPECT_RATIO:
-      this->parent_->register_query(QueryType::ASPECT_RATIO);
-      break;
-    case SelectType::LUMINANCE:
-      this->parent_->register_query(QueryType::LUMINANCE);
-      break;
-    case SelectType::GAMMA:
-      this->parent_->register_query(QueryType::GAMMA);
-      break;
+  const auto *info = find_select_type_info(this->select_type_);
+  if (info != nullptr) {
+    this->parent_->register_query(info->query_type);
   }
 
   if (!this->option_names_.empty()) {
@@ -54,25 +41,8 @@ void EpsonSelect::setup() {
 
 void EpsonSelect::dump_config() {
   LOG_SELECT("", "Epson Projector Select", this);
-  const char *type_str = "Unknown";
-  switch (this->select_type_) {
-    case SelectType::SOURCE:
-      type_str = "Source";
-      break;
-    case SelectType::COLOR_MODE:
-      type_str = "Color Mode";
-      break;
-    case SelectType::ASPECT_RATIO:
-      type_str = "Aspect Ratio";
-      break;
-    case SelectType::LUMINANCE:
-      type_str = "Luminance";
-      break;
-    case SelectType::GAMMA:
-      type_str = "Gamma";
-      break;
-  }
-  ESP_LOGCONFIG(TAG, "  Type: %s", type_str);
+  const auto *info = find_select_type_info(this->select_type_);
+  ESP_LOGCONFIG(TAG, "  Type: %s", info != nullptr ? info->name : "Unknown");
 }
 
 void EpsonSelect::control(const std::string &value) {

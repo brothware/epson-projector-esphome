@@ -10,22 +10,16 @@ void EpsonTextSensor::setup() {
   if (!setup_entity(this, TAG)) {
     return;
   }
-  switch (this->sensor_type_) {
-    case TextSensorType::SERIAL_NUMBER:
-      this->parent_->register_query(QueryType::SERIAL_NUMBER);
-      break;
+  const auto *info = find_text_sensor_type_info(this->sensor_type_);
+  if (info != nullptr) {
+    this->parent_->register_query(info->query_type);
   }
 }
 
 void EpsonTextSensor::dump_config() {
   LOG_TEXT_SENSOR("", "Epson Projector Text Sensor", this);
-  const char *type_str = "Unknown";
-  switch (this->sensor_type_) {
-    case TextSensorType::SERIAL_NUMBER:
-      type_str = "Serial Number";
-      break;
-  }
-  ESP_LOGCONFIG(TAG, "  Type: %s", type_str);
+  const auto *info = find_text_sensor_type_info(this->sensor_type_);
+  ESP_LOGCONFIG(TAG, "  Type: %s", info != nullptr ? info->name : "Unknown");
 }
 
 void EpsonTextSensor::on_state_change() {

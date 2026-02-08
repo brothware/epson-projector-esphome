@@ -4,6 +4,7 @@
 #include "esphome/core/component.h"
 
 #include "entity_base.h"
+#include "entity_metadata.h"
 #include "epson_projector.h"
 
 #include <map>
@@ -11,14 +12,6 @@
 #include <vector>
 
 namespace esphome::epson_projector {
-
-enum class SelectType : uint8_t {
-  SOURCE,
-  COLOR_MODE,
-  ASPECT_RATIO,
-  LUMINANCE,
-  GAMMA,
-};
 
 class EpsonSelect : public select::Select, public Component, public Parented<EpsonProjector> {
  public:
