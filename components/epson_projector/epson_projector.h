@@ -29,6 +29,8 @@ class EpsonProjector : public uart::UARTDevice, public PollingComponent {
   void set_volume(int volume);
   void set_brightness(int brightness);
   void set_contrast(int contrast);
+  void set_color_mode(const std::string &mode_code);
+  void set_aspect_ratio(const std::string &ratio_code);
 
   void query_power();
   void query_lamp_hours();
@@ -38,6 +40,8 @@ class EpsonProjector : public uart::UARTDevice, public PollingComponent {
   void query_volume();
   void query_brightness();
   void query_contrast();
+  void query_color_mode();
+  void query_aspect_ratio();
 
   [[nodiscard]] PowerState power_state() const { return power_state_; }
   [[nodiscard]] bool is_muted() const { return muted_; }
@@ -47,9 +51,26 @@ class EpsonProjector : public uart::UARTDevice, public PollingComponent {
   [[nodiscard]] int volume() const { return volume_; }
   [[nodiscard]] int brightness() const { return brightness_; }
   [[nodiscard]] int contrast() const { return contrast_; }
+  [[nodiscard]] const std::string &current_color_mode() const { return current_color_mode_; }
+  [[nodiscard]] const std::string &current_aspect_ratio() const { return current_aspect_ratio_; }
 
   using StateCallback = std::function<void()>;
   void add_on_state_callback(StateCallback callback) { state_callbacks_.push_back(std::move(callback)); }
+
+  enum class QueryType : uint8_t {
+    POWER,
+    LAMP_HOURS,
+    ERROR_CODE,
+    SOURCE,
+    MUTE,
+    VOLUME,
+    BRIGHTNESS,
+    CONTRAST,
+    COLOR_MODE,
+    ASPECT_RATIO,
+  };
+  void register_query(QueryType type) { registered_queries_ |= (1 << static_cast<uint16_t>(type)); }
+  bool has_query(QueryType type) const { return (registered_queries_ & (1 << static_cast<uint16_t>(type))) != 0; }
 
  protected:
   void send_command(const std::string &cmd, CommandType type,
@@ -69,6 +90,8 @@ class EpsonProjector : public uart::UARTDevice, public PollingComponent {
   uint32_t lamp_hours_{0};
   uint8_t error_code_{0};
   std::string current_source_;
+  std::string current_color_mode_;
+  std::string current_aspect_ratio_;
   int volume_{0};
   int brightness_{0};
   int contrast_{0};
@@ -79,6 +102,7 @@ class EpsonProjector : public uart::UARTDevice, public PollingComponent {
   static constexpr uint32_t BUSY_TIMEOUT_MS = 10000;
 
   std::vector<StateCallback> state_callbacks_;
+  uint16_t registered_queries_{0};
 };
 
 }  // namespace esphome::epson_projector

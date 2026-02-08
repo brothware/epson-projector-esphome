@@ -11,6 +11,14 @@ void EpsonSensor::setup() {
   if (!setup_entity(this, TAG)) {
     return;
   }
+  switch (this->sensor_type_) {
+    case SensorType::LAMP_HOURS:
+      this->parent_->register_query(EpsonProjector::QueryType::LAMP_HOURS);
+      break;
+    case SensorType::ERROR_CODE:
+      this->parent_->register_query(EpsonProjector::QueryType::ERROR_CODE);
+      break;
+  }
   ESP_LOGD(TAG, "Sensor setup complete, callback registered");
 }
 

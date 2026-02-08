@@ -10,6 +10,14 @@ void EpsonSwitch::setup() {
   if (!setup_entity(this, TAG)) {
     return;
   }
+  switch (this->switch_type_) {
+    case SwitchType::POWER:
+      this->parent_->register_query(EpsonProjector::QueryType::POWER);
+      break;
+    case SwitchType::MUTE:
+      this->parent_->register_query(EpsonProjector::QueryType::MUTE);
+      break;
+  }
 }
 
 void EpsonSwitch::dump_config() {

@@ -10,6 +10,17 @@ void EpsonNumber::setup() {
   if (!setup_entity(this, TAG)) {
     return;
   }
+  switch (this->number_type_) {
+    case NumberType::BRIGHTNESS:
+      this->parent_->register_query(EpsonProjector::QueryType::BRIGHTNESS);
+      break;
+    case NumberType::CONTRAST:
+      this->parent_->register_query(EpsonProjector::QueryType::CONTRAST);
+      break;
+    case NumberType::VOLUME:
+      this->parent_->register_query(EpsonProjector::QueryType::VOLUME);
+      break;
+  }
 }
 
 void EpsonNumber::dump_config() {

@@ -41,6 +41,14 @@ struct ContrastResponse {
   int value;
 };
 
+struct ColorModeResponse {
+  std::string mode_code;
+};
+
+struct AspectRatioResponse {
+  std::string ratio_code;
+};
+
 struct NumericResponse {
   int value;
 };
@@ -55,9 +63,9 @@ struct ErrorResult {
   std::string message;
 };
 
-using ParseResult =
-    std::variant<PowerResponse, LampResponse, ErrorResponse, SourceResponse, MuteResponse, VolumeResponse,
-                 BrightnessResponse, ContrastResponse, NumericResponse, StringResponse, AckResponse, ErrorResult>;
+using ParseResult = std::variant<PowerResponse, LampResponse, ErrorResponse, SourceResponse, MuteResponse,
+                                 VolumeResponse, BrightnessResponse, ContrastResponse, ColorModeResponse,
+                                 AspectRatioResponse, NumericResponse, StringResponse, AckResponse, ErrorResult>;
 
 class ResponseParser {
  public:

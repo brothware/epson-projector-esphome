@@ -68,14 +68,37 @@ bool EpsonProjector::is_busy_state() const {
 }
 
 void EpsonProjector::update() {
-  this->query_power();
+  if (this->has_query(QueryType::POWER)) {
+    this->query_power();
+  }
   if (this->power_state_ == PowerState::ON) {
-    this->query_lamp_hours();
-    this->query_source();
-    this->query_mute();
-    this->query_brightness();
-    this->query_contrast();
-    this->query_volume();
+    if (this->has_query(QueryType::LAMP_HOURS)) {
+      this->query_lamp_hours();
+    }
+    if (this->has_query(QueryType::ERROR_CODE)) {
+      this->query_error();
+    }
+    if (this->has_query(QueryType::SOURCE)) {
+      this->query_source();
+    }
+    if (this->has_query(QueryType::MUTE)) {
+      this->query_mute();
+    }
+    if (this->has_query(QueryType::BRIGHTNESS)) {
+      this->query_brightness();
+    }
+    if (this->has_query(QueryType::CONTRAST)) {
+      this->query_contrast();
+    }
+    if (this->has_query(QueryType::VOLUME)) {
+      this->query_volume();
+    }
+    if (this->has_query(QueryType::COLOR_MODE)) {
+      this->query_color_mode();
+    }
+    if (this->has_query(QueryType::ASPECT_RATIO)) {
+      this->query_aspect_ratio();
+    }
   }
 }
 
@@ -157,6 +180,26 @@ void EpsonProjector::set_contrast(int contrast) {
   });
 }
 
+void EpsonProjector::set_color_mode(const std::string &mode_code) {
+  std::string cmd = build_set_command(CMD_COLOR_MODE, mode_code.c_str());
+  this->send_command(cmd, CommandType::SET, [this, mode_code](bool success, const std::string &) {
+    if (success) {
+      this->current_color_mode_ = mode_code;
+      this->notify_state_change();
+    }
+  });
+}
+
+void EpsonProjector::set_aspect_ratio(const std::string &ratio_code) {
+  std::string cmd = build_set_command(CMD_ASPECT, ratio_code.c_str());
+  this->send_command(cmd, CommandType::SET, [this, ratio_code](bool success, const std::string &) {
+    if (success) {
+      this->current_aspect_ratio_ = ratio_code;
+      this->notify_state_change();
+    }
+  });
+}
+
 void EpsonProjector::query_power() {
   std::string cmd = build_query_command(CMD_POWER);
   this->send_command(cmd, CommandType::QUERY);
@@ -194,6 +237,16 @@ void EpsonProjector::query_brightness() {
 
 void EpsonProjector::query_contrast() {
   std::string cmd = build_query_command(CMD_CONTRAST);
+  this->send_command(cmd, CommandType::QUERY);
+}
+
+void EpsonProjector::query_color_mode() {
+  std::string cmd = build_query_command(CMD_COLOR_MODE);
+  this->send_command(cmd, CommandType::QUERY);
+}
+
+void EpsonProjector::query_aspect_ratio() {
+  std::string cmd = build_query_command(CMD_ASPECT);
   this->send_command(cmd, CommandType::QUERY);
 }
 
@@ -260,6 +313,14 @@ void EpsonProjector::handle_response(const std::string &response) {
         } else if constexpr (std::is_same_v<T, ContrastResponse>) {
           ESP_LOGD(TAG, "Contrast: %d", arg.value);
           this->contrast_ = arg.value;
+          this->notify_state_change();
+        } else if constexpr (std::is_same_v<T, ColorModeResponse>) {
+          ESP_LOGD(TAG, "Color mode: %s", arg.mode_code.c_str());
+          this->current_color_mode_ = arg.mode_code;
+          this->notify_state_change();
+        } else if constexpr (std::is_same_v<T, AspectRatioResponse>) {
+          ESP_LOGD(TAG, "Aspect ratio: %s", arg.ratio_code.c_str());
+          this->current_aspect_ratio_ = arg.ratio_code;
           this->notify_state_change();
         } else if constexpr (std::is_same_v<T, NumericResponse>) {
           ESP_LOGD(TAG, "Numeric response: %d", arg.value);

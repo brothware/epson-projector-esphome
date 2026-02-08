@@ -100,12 +100,12 @@ TEST_F(ResponseParserTest, ParsesMuteOff) {
   EXPECT_FALSE(mute->muted);
 }
 
-TEST_F(ResponseParserTest, ParsesVolumeNumeric) {
+TEST_F(ResponseParserTest, ParsesVolume) {
   auto result = parser.parse("VOL=15\r:");
   ASSERT_TRUE(result.has_value());
-  auto *num = std::get_if<NumericResponse>(&*result);
-  ASSERT_NE(num, nullptr);
-  EXPECT_EQ(num->value, 15);
+  auto *vol = std::get_if<VolumeResponse>(&*result);
+  ASSERT_NE(vol, nullptr);
+  EXPECT_EQ(vol->value, 15);
 }
 
 TEST_F(ResponseParserTest, ParsesAckResponse) {

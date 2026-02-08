@@ -13,7 +13,8 @@ class Features(TypedDict, total=False):
     volume: bool
     brightness: FeatureRange
     contrast: FeatureRange
-    color_modes: list[str]
+    color_modes: dict[str, str]
+    aspect_ratios: dict[str, str]
     keystone_vertical: bool
     keystone_horizontal: bool
     luminance: bool
@@ -89,16 +90,85 @@ FEATURES_BASE: Features = {
     "keystone_horizontal": True,
 }
 
-COLOR_MODES_HOME_CINEMA = ["dynamic", "cinema", "natural", "bright_cinema"]
-COLOR_MODES_HOME_CINEMA_3D = [*COLOR_MODES_HOME_CINEMA, "3d_dynamic", "3d_cinema"]
-COLOR_MODES_BUSINESS = ["presentation", "text", "srgb", "blackboard"]
-COLOR_MODES_BUSINESS_ALT = ["dynamic", "presentation", "cinema", "srgb"]
+COLOR_MODE_CODES = {
+    "Dynamic": "06",
+    "Cinema": "05",
+    "Natural": "07",
+    "Bright Cinema": "0C",
+    "sRGB": "01",
+    "Presentation": "04",
+    "Text": "02",
+    "Blackboard": "11",
+    "Photo": "14",
+    "Sports": "08",
+    "Custom": "10",
+    "3D Dynamic": "15",
+    "3D Cinema": "17",
+}
+
+COLOR_MODES_HOME_CINEMA = {
+    "Dynamic": "06",
+    "Cinema": "05",
+    "Natural": "07",
+    "Bright Cinema": "0C",
+}
+
+COLOR_MODES_HOME_CINEMA_3D = {
+    **COLOR_MODES_HOME_CINEMA,
+    "3D Dynamic": "15",
+    "3D Cinema": "17",
+}
+
+COLOR_MODES_BUSINESS = {
+    "Presentation": "04",
+    "Text": "02",
+    "sRGB": "01",
+    "Blackboard": "11",
+}
+
+COLOR_MODES_BUSINESS_ALT = {
+    "Dynamic": "06",
+    "Presentation": "04",
+    "Cinema": "05",
+    "sRGB": "01",
+}
+
+ASPECT_RATIO_CODES = {
+    "Normal": "00",
+    "4:3": "10",
+    "16:9": "20",
+    "Auto": "30",
+    "Full": "40",
+    "Zoom": "50",
+    "Native": "60",
+    "Wide": "70",
+    "Anamorphic": "80",
+}
+
+ASPECT_RATIOS_HOME_CINEMA = {
+    "Normal": "00",
+    "Auto": "30",
+    "Full": "40",
+    "Zoom": "50",
+    "Wide": "70",
+    "Anamorphic": "80",
+}
+
+ASPECT_RATIOS_BUSINESS = {
+    "Normal": "00",
+    "4:3": "10",
+    "16:9": "20",
+    "Auto": "30",
+    "Full": "40",
+    "Zoom": "50",
+}
 
 
 def _home_cinema(
     name: str,
     sources: dict[str, str] = SOURCES_HDMI,
-    color_modes: list[str] = COLOR_MODES_HOME_CINEMA,
+    color_modes: dict[str, str] = COLOR_MODES_HOME_CINEMA,
+    aspect_ratios: dict[str, str] = ASPECT_RATIOS_HOME_CINEMA,
     has_3d: bool = False,
 ) -> ProjectorModel:
     modes = COLOR_MODES_HOME_CINEMA_3D if has_3d else color_modes
@@ -109,6 +179,7 @@ def _home_cinema(
         "features": {
             **FEATURES_BASE,
             "color_modes": modes,
+            "aspect_ratios": aspect_ratios,
             "luminance": True,
         },
     }
@@ -117,7 +188,8 @@ def _home_cinema(
 def _business(
     name: str,
     sources: dict[str, str] = SOURCES_BUSINESS,
-    color_modes: list[str] = COLOR_MODES_BUSINESS,
+    color_modes: dict[str, str] = COLOR_MODES_BUSINESS,
+    aspect_ratios: dict[str, str] = ASPECT_RATIOS_BUSINESS,
     keystone_horizontal: bool = True,
 ) -> ProjectorModel:
     return {
@@ -127,6 +199,7 @@ def _business(
         "features": {
             **FEATURES_BASE,
             "color_modes": color_modes,
+            "aspect_ratios": aspect_ratios,
             "keystone_horizontal": keystone_horizontal,
         },
     }
@@ -352,7 +425,11 @@ PROJECTOR_MODELS: dict[str, ProjectorModel] = {
         "name": "Generic ESC/VP21",
         "category": "generic",
         "sources": SOURCES_ALL,
-        "features": FEATURES_BASE,
+        "features": {
+            **FEATURES_BASE,
+            "color_modes": COLOR_MODE_CODES,
+            "aspect_ratios": ASPECT_RATIO_CODES,
+        },
     },
 }
 
@@ -377,3 +454,17 @@ def has_feature(model_id: str, feature: str) -> bool:
     if model is None:
         return False
     return bool(model["features"].get(feature))
+
+
+def get_color_modes_for_model(model_id: str) -> dict[str, str]:
+    model = get_model(model_id)
+    if model is None:
+        return {}
+    return model["features"].get("color_modes", {})
+
+
+def get_aspect_ratios_for_model(model_id: str) -> dict[str, str]:
+    model = get_model(model_id)
+    if model is None:
+        return {}
+    return model["features"].get("aspect_ratios", {})

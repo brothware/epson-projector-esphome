@@ -95,6 +95,14 @@ std::optional<ParseResult> ResponseParser::parse_key_value(const std::string &ke
     return ContrastResponse{scaled};
   }
 
+  if (key == CMD_COLOR_MODE) {
+    return ColorModeResponse{value};
+  }
+
+  if (key == CMD_ASPECT) {
+    return AspectRatioResponse{value};
+  }
+
   if (key == CMD_DENSITY || key == CMD_TINT || key == CMD_SHARPNESS || key == CMD_VKEYSTONE || key == CMD_HKEYSTONE) {
     return NumericResponse{std::stoi(value)};
   }

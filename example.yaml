@@ -69,6 +69,8 @@ select:
       name: "Input Source"
     color_mode:
       name: "Color Mode"
+    aspect_ratio:
+      name: "Aspect Ratio"
 
 number:
   - platform: epson_projector

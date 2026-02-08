@@ -24,6 +24,18 @@ void EpsonSelect::setup() {
     return;
   }
 
+  switch (this->select_type_) {
+    case SelectType::SOURCE:
+      this->parent_->register_query(EpsonProjector::QueryType::SOURCE);
+      break;
+    case SelectType::COLOR_MODE:
+      this->parent_->register_query(EpsonProjector::QueryType::COLOR_MODE);
+      break;
+    case SelectType::ASPECT_RATIO:
+      this->parent_->register_query(EpsonProjector::QueryType::ASPECT_RATIO);
+      break;
+  }
+
   if (!this->option_names_.empty()) {
     FixedVector<const char *> option_ptrs;
     option_ptrs.init(this->option_names_.size());
@@ -64,19 +76,29 @@ void EpsonSelect::control(const std::string &value) {
       this->parent_->set_source(code);
       break;
     case SelectType::COLOR_MODE:
+      this->parent_->set_color_mode(code);
+      break;
     case SelectType::ASPECT_RATIO:
-      ESP_LOGW(TAG, "Not implemented yet");
+      this->parent_->set_aspect_ratio(code);
       break;
   }
   this->publish_state(value);
 }
 
 void EpsonSelect::on_state_change() {
-  if (this->select_type_ != SelectType::SOURCE) {
-    return;
+  std::string current;
+  switch (this->select_type_) {
+    case SelectType::SOURCE:
+      current = this->parent_->current_source();
+      break;
+    case SelectType::COLOR_MODE:
+      current = this->parent_->current_color_mode();
+      break;
+    case SelectType::ASPECT_RATIO:
+      current = this->parent_->current_aspect_ratio();
+      break;
   }
 
-  const std::string &current = this->parent_->current_source();
   auto it = this->reverse_map_.find(current);
   if (it != this->reverse_map_.end()) {
     this->publish_state(it->second);
