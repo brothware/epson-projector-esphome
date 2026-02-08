@@ -100,12 +100,20 @@ TEST_F(ResponseParserTest, ParsesMuteOff) {
   EXPECT_FALSE(mute->muted);
 }
 
-TEST_F(ResponseParserTest, ParsesVolume) {
-  auto result = parser.parse("VOL=15\r:");
+TEST_F(ResponseParserTest, ParsesVolumeScaling) {
+  auto result = parser.parse("VOL=191\r:");
   ASSERT_TRUE(result.has_value());
   auto *vol = std::get_if<VolumeResponse>(&*result);
   ASSERT_NE(vol, nullptr);
-  EXPECT_EQ(vol->value, 15);
+  EXPECT_EQ(vol->value, 14);
+}
+
+TEST_F(ResponseParserTest, ParsesVolumeScalingMax) {
+  auto result = parser.parse("VOL=255\r:");
+  ASSERT_TRUE(result.has_value());
+  auto *vol = std::get_if<VolumeResponse>(&*result);
+  ASSERT_NE(vol, nullptr);
+  EXPECT_EQ(vol->value, 20);
 }
 
 TEST_F(ResponseParserTest, ParsesAckResponse) {
@@ -127,76 +135,92 @@ TEST_F(ResponseParserTest, HandlesInvalidFormat) {
   EXPECT_TRUE(result.error().contains("Invalid response format"));
 }
 
-TEST_F(ResponseParserTest, ParsesSharpness) {
-  auto result = parser.parse("SHARP=10\r:");
+TEST_F(ResponseParserTest, ParsesSharpnessScaling) {
+  auto result = parser.parse("SHARP=127\r:");
   ASSERT_TRUE(result.has_value());
   auto *sharp = std::get_if<SharpnessResponse>(&*result);
   ASSERT_NE(sharp, nullptr);
-  EXPECT_EQ(sharp->value, 10);
+  EXPECT_EQ(sharp->value, 9);
 }
 
-TEST_F(ResponseParserTest, ParsesDensity) {
-  auto result = parser.parse("DENSITY=5\r:");
+TEST_F(ResponseParserTest, ParsesSharpnessScalingMax) {
+  auto result = parser.parse("SHARP=255\r:");
+  ASSERT_TRUE(result.has_value());
+  auto *sharp = std::get_if<SharpnessResponse>(&*result);
+  ASSERT_NE(sharp, nullptr);
+  EXPECT_EQ(sharp->value, 20);
+}
+
+TEST_F(ResponseParserTest, ParsesDensityScaling) {
+  auto result = parser.parse("DENSITY=127\r:");
   ASSERT_TRUE(result.has_value());
   auto *density = std::get_if<DensityResponse>(&*result);
   ASSERT_NE(density, nullptr);
-  EXPECT_EQ(density->value, 5);
+  EXPECT_EQ(density->value, 49);
 }
 
-TEST_F(ResponseParserTest, ParsesDensityNegative) {
-  auto result = parser.parse("DENSITY=-15\r:");
+TEST_F(ResponseParserTest, ParsesDensityScalingMax) {
+  auto result = parser.parse("DENSITY=255\r:");
   ASSERT_TRUE(result.has_value());
   auto *density = std::get_if<DensityResponse>(&*result);
   ASSERT_NE(density, nullptr);
-  EXPECT_EQ(density->value, -15);
+  EXPECT_EQ(density->value, 100);
 }
 
-TEST_F(ResponseParserTest, ParsesTint) {
-  auto result = parser.parse("TINT=12\r:");
+TEST_F(ResponseParserTest, ParsesTintScaling) {
+  auto result = parser.parse("TINT=127\r:");
   ASSERT_TRUE(result.has_value());
   auto *tint = std::get_if<TintResponse>(&*result);
   ASSERT_NE(tint, nullptr);
-  EXPECT_EQ(tint->value, 12);
+  EXPECT_EQ(tint->value, 49);
 }
 
-TEST_F(ResponseParserTest, ParsesTintNegative) {
-  auto result = parser.parse("TINT=-20\r:");
+TEST_F(ResponseParserTest, ParsesTintScalingMax) {
+  auto result = parser.parse("TINT=255\r:");
   ASSERT_TRUE(result.has_value());
   auto *tint = std::get_if<TintResponse>(&*result);
   ASSERT_NE(tint, nullptr);
-  EXPECT_EQ(tint->value, -20);
+  EXPECT_EQ(tint->value, 100);
 }
 
-TEST_F(ResponseParserTest, ParsesColorTemperature) {
-  auto result = parser.parse("CTEMP=5\r:");
+TEST_F(ResponseParserTest, ParsesColorTemperatureScaling) {
+  auto result = parser.parse("CTEMP=98\r:");
   ASSERT_TRUE(result.has_value());
   auto *ctemp = std::get_if<ColorTempResponse>(&*result);
   ASSERT_NE(ctemp, nullptr);
-  EXPECT_EQ(ctemp->value, 5);
+  EXPECT_EQ(ctemp->value, 4);
 }
 
-TEST_F(ResponseParserTest, ParsesVKeystone) {
-  auto result = parser.parse("VKEYSTONE=15\r:");
+TEST_F(ResponseParserTest, ParsesColorTemperatureScalingMax) {
+  auto result = parser.parse("CTEMP=255\r:");
+  ASSERT_TRUE(result.has_value());
+  auto *ctemp = std::get_if<ColorTempResponse>(&*result);
+  ASSERT_NE(ctemp, nullptr);
+  EXPECT_EQ(ctemp->value, 13);
+}
+
+TEST_F(ResponseParserTest, ParsesVKeystoneScaling) {
+  auto result = parser.parse("VKEYSTONE=127\r:");
   ASSERT_TRUE(result.has_value());
   auto *vk = std::get_if<VKeystoneResponse>(&*result);
   ASSERT_NE(vk, nullptr);
-  EXPECT_EQ(vk->value, 15);
+  EXPECT_EQ(vk->value, 29);
 }
 
-TEST_F(ResponseParserTest, ParsesVKeystoneNegative) {
-  auto result = parser.parse("VKEYSTONE=-20\r:");
+TEST_F(ResponseParserTest, ParsesVKeystoneScalingMax) {
+  auto result = parser.parse("VKEYSTONE=255\r:");
   ASSERT_TRUE(result.has_value());
   auto *vk = std::get_if<VKeystoneResponse>(&*result);
   ASSERT_NE(vk, nullptr);
-  EXPECT_EQ(vk->value, -20);
+  EXPECT_EQ(vk->value, 60);
 }
 
-TEST_F(ResponseParserTest, ParsesHKeystone) {
-  auto result = parser.parse("HKEYSTONE=10\r:");
+TEST_F(ResponseParserTest, ParsesHKeystoneScaling) {
+  auto result = parser.parse("HKEYSTONE=127\r:");
   ASSERT_TRUE(result.has_value());
   auto *hk = std::get_if<HKeystoneResponse>(&*result);
   ASSERT_NE(hk, nullptr);
-  EXPECT_EQ(hk->value, 10);
+  EXPECT_EQ(hk->value, 29);
 }
 
 TEST_F(ResponseParserTest, ParsesHReverseOn) {
@@ -302,31 +326,31 @@ TEST_F(ResponseParserTest, HandlesMalformedLampHours) {
 TEST_F(ResponseParserTest, HandlesMalformedVolume) {
   auto result = parser.parse("VOL=not_a_number\r:");
   ASSERT_FALSE(result.has_value());
-  EXPECT_TRUE(result.error().contains("Invalid volume"));
+  EXPECT_TRUE(result.error().contains("Invalid VOL"));
 }
 
 TEST_F(ResponseParserTest, HandlesMalformedBrightness) {
   auto result = parser.parse("BRIGHT=invalid\r:");
   ASSERT_FALSE(result.has_value());
-  EXPECT_TRUE(result.error().contains("Invalid brightness"));
+  EXPECT_TRUE(result.error().contains("Invalid BRIGHT"));
 }
 
 TEST_F(ResponseParserTest, HandlesMalformedSharpness) {
   auto result = parser.parse("SHARP=bad\r:");
   ASSERT_FALSE(result.has_value());
-  EXPECT_TRUE(result.error().contains("Invalid sharpness"));
+  EXPECT_TRUE(result.error().contains("Invalid SHARP"));
 }
 
 TEST_F(ResponseParserTest, HandlesMalformedVKeystone) {
   auto result = parser.parse("VKEYSTONE=wrong\r:");
   ASSERT_FALSE(result.has_value());
-  EXPECT_TRUE(result.error().contains("Invalid vertical keystone"));
+  EXPECT_TRUE(result.error().contains("Invalid VKEYSTONE"));
 }
 
 TEST_F(ResponseParserTest, HandlesEmptyValue) {
   auto result = parser.parse("VOL=\r:");
   ASSERT_FALSE(result.has_value());
-  EXPECT_TRUE(result.error().contains("Invalid volume"));
+  EXPECT_TRUE(result.error().contains("Invalid VOL"));
 }
 
 TEST_F(ResponseParserTest, HandlesLargeLampHours) {
