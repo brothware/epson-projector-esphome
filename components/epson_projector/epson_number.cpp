@@ -46,9 +46,19 @@ void EpsonNumber::control(float value) {
 }
 
 void EpsonNumber::on_state_change() {
-  if (this->number_type_ == NumberType::VOLUME) {
-    this->publish_state(static_cast<float>(this->parent_->volume()));
+  float value = 0;
+  switch (this->number_type_) {
+    case NumberType::BRIGHTNESS:
+      value = static_cast<float>(this->parent_->brightness());
+      break;
+    case NumberType::CONTRAST:
+      value = static_cast<float>(this->parent_->contrast());
+      break;
+    case NumberType::VOLUME:
+      value = static_cast<float>(this->parent_->volume());
+      break;
   }
+  this->publish_state(value);
 }
 
 }  // namespace esphome::epson_projector

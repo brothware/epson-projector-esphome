@@ -8,26 +8,29 @@ namespace esphome::epson_projector {
 static const char *const TAG = "epson_projector.select";
 
 void EpsonSelect::set_options_map(const std::map<std::string, std::string> &options_map) {
-  this->options_map_ = options_map;
-  this->reverse_map_.clear();
-  this->option_names_.clear();
-
   for (const auto &[name, code] : options_map) {
-    this->option_names_.push_back(name);
-    this->reverse_map_[code] = name;
+    this->add_option(name, code);
   }
+}
 
-  FixedVector<const char *> option_ptrs;
-  option_ptrs.init(this->option_names_.size());
-  for (const auto &name : this->option_names_) {
-    option_ptrs.push_back(name.c_str());
-  }
-  this->traits.set_options(option_ptrs);
+void EpsonSelect::add_option(const std::string &name, const std::string &code) {
+  this->options_map_[name] = code;
+  this->reverse_map_[code] = name;
+  this->option_names_.push_back(name);
 }
 
 void EpsonSelect::setup() {
   if (!setup_entity(this, TAG)) {
     return;
+  }
+
+  if (!this->option_names_.empty()) {
+    FixedVector<const char *> option_ptrs;
+    option_ptrs.init(this->option_names_.size());
+    for (const auto &name : this->option_names_) {
+      option_ptrs.push_back(name.c_str());
+    }
+    this->traits.set_options(option_ptrs);
   }
 }
 

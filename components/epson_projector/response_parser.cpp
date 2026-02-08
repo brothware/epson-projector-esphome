@@ -79,8 +79,23 @@ std::optional<ParseResult> ResponseParser::parse_key_value(const std::string &ke
     return MuteResponse{value == ARG_ON || value == "01"};
   }
 
-  if (key == CMD_VOLUME || key == CMD_BRIGHTNESS || key == CMD_CONTRAST || key == CMD_DENSITY || key == CMD_TINT ||
-      key == CMD_SHARPNESS || key == CMD_VKEYSTONE || key == CMD_HKEYSTONE) {
+  if (key == CMD_VOLUME) {
+    return VolumeResponse{std::stoi(value)};
+  }
+
+  if (key == CMD_BRIGHTNESS) {
+    int raw_value = std::stoi(value);
+    int scaled = (raw_value * BRIGHTNESS_MAX) / PROJECTOR_BRIGHTNESS_MAX;
+    return BrightnessResponse{scaled};
+  }
+
+  if (key == CMD_CONTRAST) {
+    int raw_value = std::stoi(value);
+    int scaled = (raw_value * CONTRAST_MAX) / PROJECTOR_CONTRAST_MAX;
+    return ContrastResponse{scaled};
+  }
+
+  if (key == CMD_DENSITY || key == CMD_TINT || key == CMD_SHARPNESS || key == CMD_VKEYSTONE || key == CMD_HKEYSTONE) {
     return NumericResponse{std::stoi(value)};
   }
 

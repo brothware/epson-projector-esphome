@@ -25,6 +25,7 @@ class EpsonSelect : public select::Select, public Component, public Parented<Eps
 
   void set_select_type(SelectType type) { this->select_type_ = type; }
   void set_options_map(const std::map<std::string, std::string> &options_map);
+  void add_option(const std::string &name, const std::string &code);
 
   void on_state_change();
 

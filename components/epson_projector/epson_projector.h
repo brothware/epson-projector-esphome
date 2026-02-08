@@ -36,6 +36,8 @@ class EpsonProjector : public uart::UARTDevice, public PollingComponent {
   void query_source();
   void query_mute();
   void query_volume();
+  void query_brightness();
+  void query_contrast();
 
   [[nodiscard]] PowerState power_state() const { return power_state_; }
   [[nodiscard]] bool is_muted() const { return muted_; }
@@ -43,6 +45,8 @@ class EpsonProjector : public uart::UARTDevice, public PollingComponent {
   [[nodiscard]] uint8_t error_code() const { return error_code_; }
   [[nodiscard]] const std::string &current_source() const { return current_source_; }
   [[nodiscard]] int volume() const { return volume_; }
+  [[nodiscard]] int brightness() const { return brightness_; }
+  [[nodiscard]] int contrast() const { return contrast_; }
 
   using StateCallback = std::function<void()>;
   void add_on_state_callback(StateCallback callback) { state_callbacks_.push_back(std::move(callback)); }
@@ -66,6 +70,8 @@ class EpsonProjector : public uart::UARTDevice, public PollingComponent {
   uint8_t error_code_{0};
   std::string current_source_;
   int volume_{0};
+  int brightness_{0};
+  int contrast_{0};
 
   uint32_t last_command_time_{0};
   static constexpr uint32_t COMMAND_DELAY_MS = 500;

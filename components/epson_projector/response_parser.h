@@ -29,6 +29,18 @@ struct MuteResponse {
   bool muted;
 };
 
+struct VolumeResponse {
+  int value;
+};
+
+struct BrightnessResponse {
+  int value;
+};
+
+struct ContrastResponse {
+  int value;
+};
+
 struct NumericResponse {
   int value;
 };
@@ -43,8 +55,9 @@ struct ErrorResult {
   std::string message;
 };
 
-using ParseResult = std::variant<PowerResponse, LampResponse, ErrorResponse, SourceResponse, MuteResponse,
-                                 NumericResponse, StringResponse, AckResponse, ErrorResult>;
+using ParseResult =
+    std::variant<PowerResponse, LampResponse, ErrorResponse, SourceResponse, MuteResponse, VolumeResponse,
+                 BrightnessResponse, ContrastResponse, NumericResponse, StringResponse, AckResponse, ErrorResult>;
 
 class ResponseParser {
  public:

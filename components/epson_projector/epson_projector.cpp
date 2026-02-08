@@ -73,6 +73,9 @@ void EpsonProjector::update() {
     this->query_lamp_hours();
     this->query_source();
     this->query_mute();
+    this->query_brightness();
+    this->query_contrast();
+    this->query_volume();
   }
 }
 
@@ -132,14 +135,26 @@ void EpsonProjector::set_volume(int volume) {
 
 void EpsonProjector::set_brightness(int brightness) {
   int clamped = clamp_value(brightness, BRIGHTNESS_MIN, BRIGHTNESS_MAX);
-  std::string cmd = build_set_command(CMD_BRIGHTNESS, clamped);
-  this->send_command(cmd, CommandType::SET);
+  int projector_value = (clamped * PROJECTOR_BRIGHTNESS_MAX) / BRIGHTNESS_MAX;
+  std::string cmd = build_set_command(CMD_BRIGHTNESS, projector_value);
+  this->send_command(cmd, CommandType::SET, [this, clamped](bool success, const std::string &) {
+    if (success) {
+      this->brightness_ = clamped;
+      this->notify_state_change();
+    }
+  });
 }
 
 void EpsonProjector::set_contrast(int contrast) {
   int clamped = clamp_value(contrast, CONTRAST_MIN, CONTRAST_MAX);
-  std::string cmd = build_set_command(CMD_CONTRAST, clamped);
-  this->send_command(cmd, CommandType::SET);
+  int projector_value = (clamped * PROJECTOR_CONTRAST_MAX) / CONTRAST_MAX;
+  std::string cmd = build_set_command(CMD_CONTRAST, projector_value);
+  this->send_command(cmd, CommandType::SET, [this, clamped](bool success, const std::string &) {
+    if (success) {
+      this->contrast_ = clamped;
+      this->notify_state_change();
+    }
+  });
 }
 
 void EpsonProjector::query_power() {
@@ -169,6 +184,16 @@ void EpsonProjector::query_mute() {
 
 void EpsonProjector::query_volume() {
   std::string cmd = build_query_command(CMD_VOLUME);
+  this->send_command(cmd, CommandType::QUERY);
+}
+
+void EpsonProjector::query_brightness() {
+  std::string cmd = build_query_command(CMD_BRIGHTNESS);
+  this->send_command(cmd, CommandType::QUERY);
+}
+
+void EpsonProjector::query_contrast() {
+  std::string cmd = build_query_command(CMD_CONTRAST);
   this->send_command(cmd, CommandType::QUERY);
 }
 
@@ -223,6 +248,18 @@ void EpsonProjector::handle_response(const std::string &response) {
         } else if constexpr (std::is_same_v<T, MuteResponse>) {
           ESP_LOGD(TAG, "Mute: %s", arg.muted ? "ON" : "OFF");
           this->muted_ = arg.muted;
+          this->notify_state_change();
+        } else if constexpr (std::is_same_v<T, VolumeResponse>) {
+          ESP_LOGD(TAG, "Volume: %d", arg.value);
+          this->volume_ = arg.value;
+          this->notify_state_change();
+        } else if constexpr (std::is_same_v<T, BrightnessResponse>) {
+          ESP_LOGD(TAG, "Brightness: %d", arg.value);
+          this->brightness_ = arg.value;
+          this->notify_state_change();
+        } else if constexpr (std::is_same_v<T, ContrastResponse>) {
+          ESP_LOGD(TAG, "Contrast: %d", arg.value);
+          this->contrast_ = arg.value;
           this->notify_state_change();
         } else if constexpr (std::is_same_v<T, NumericResponse>) {
           ESP_LOGD(TAG, "Numeric response: %d", arg.value);

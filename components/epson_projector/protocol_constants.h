@@ -40,11 +40,14 @@ static constexpr const char *RESPONSE_OK = ":";
 static constexpr const char *RESPONSE_ERR = "ERR";
 
 static constexpr int BRIGHTNESS_MIN = 0;
-static constexpr int BRIGHTNESS_MAX = 255;
-static constexpr int CONTRAST_MIN = -32;
-static constexpr int CONTRAST_MAX = 32;
+static constexpr int BRIGHTNESS_MAX = 100;
+static constexpr int CONTRAST_MIN = 0;
+static constexpr int CONTRAST_MAX = 100;
 static constexpr int VOLUME_MIN = 0;
 static constexpr int VOLUME_MAX = 20;
+
+static constexpr int PROJECTOR_BRIGHTNESS_MAX = 255;
+static constexpr int PROJECTOR_CONTRAST_MAX = 255;
 
 enum class PowerState : uint8_t {
   STANDBY = 0,
