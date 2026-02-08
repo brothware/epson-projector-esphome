@@ -53,6 +53,8 @@ class EpsonProjector : public uart::UARTDevice, public PollingComponent {
   void process_queue();
   void handle_response(const std::string &response);
   void notify_state_change();
+  std::string format_response_for_log(const std::string &response);
+  bool is_busy_state() const;
 
   CommandQueue command_queue_;
   ResponseParser response_parser_;
@@ -68,6 +70,7 @@ class EpsonProjector : public uart::UARTDevice, public PollingComponent {
   uint32_t last_command_time_{0};
   static constexpr uint32_t COMMAND_DELAY_MS = 500;
   static constexpr uint32_t RESPONSE_TIMEOUT_MS = 3000;
+  static constexpr uint32_t BUSY_TIMEOUT_MS = 10000;
 
   std::vector<StateCallback> state_callbacks_;
 };

@@ -17,7 +17,8 @@ void EpsonProjector::loop() {
     this->rx_buffer_ += c;
 
     if (this->response_parser_.is_complete_response(this->rx_buffer_)) {
-      ESP_LOGV(TAG, "Received: %s", this->rx_buffer_.c_str());
+      ESP_LOGD(TAG, "Raw response: '%s' (len=%d)", this->format_response_for_log(this->rx_buffer_).c_str(),
+               this->rx_buffer_.length());
       this->handle_response(this->rx_buffer_);
       this->rx_buffer_.clear();
     }
@@ -25,8 +26,11 @@ void EpsonProjector::loop() {
 
   uint32_t now = millis();
   if (this->command_queue_.has_pending_command()) {
-    if (now - this->last_command_time_ > RESPONSE_TIMEOUT_MS) {
-      ESP_LOGW(TAG, "Command timeout");
+    uint32_t timeout = this->is_busy_state() ? BUSY_TIMEOUT_MS : RESPONSE_TIMEOUT_MS;
+    if (now - this->last_command_time_ > timeout) {
+      if (!this->is_busy_state()) {
+        ESP_LOGW(TAG, "Command timeout");
+      }
       auto &pending = this->command_queue_.pending_command();
       if (pending && pending->callback) {
         pending->callback(false, "");
@@ -39,6 +43,28 @@ void EpsonProjector::loop() {
       this->process_queue();
     }
   }
+}
+
+std::string EpsonProjector::format_response_for_log(const std::string &response) {
+  std::string result;
+  for (char c : response) {
+    if (c == '\r') {
+      result += "\\r";
+    } else if (c == '\n') {
+      result += "\\n";
+    } else if (c < 32 || c > 126) {
+      char hex[8];
+      snprintf(hex, sizeof(hex), "\\x%02X", static_cast<unsigned char>(c));
+      result += hex;
+    } else {
+      result += c;
+    }
+  }
+  return result;
+}
+
+bool EpsonProjector::is_busy_state() const {
+  return this->power_state_ == PowerState::WARMUP || this->power_state_ == PowerState::COOLDOWN;
 }
 
 void EpsonProjector::update() {
