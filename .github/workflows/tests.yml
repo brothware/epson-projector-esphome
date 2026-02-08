@@ -14,6 +14,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
+          cache: "pip"
 
       - name: Install dependencies
         run: |
@@ -28,6 +29,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Cache CMake build
+        uses: actions/cache@v4
+        with:
+          path: tests/cpp/build
+          key: cpp-build-${{ runner.os }}-${{ hashFiles('tests/cpp/**', 'components/**/*.cpp', 'components/**/*.h') }}
+          restore-keys: cpp-build-${{ runner.os }}-
+
       - name: Install dependencies
         run: |
           sudo apt-get update
@@ -38,5 +46,5 @@ jobs:
           cd tests/cpp
           mkdir -p build && cd build
           cmake .. -DCMAKE_CXX_COMPILER=g++-13
-          make
+          make -j$(nproc)
           ctest --output-on-failure
