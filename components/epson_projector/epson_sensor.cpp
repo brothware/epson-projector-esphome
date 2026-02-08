@@ -7,9 +7,11 @@ namespace esphome::epson_projector {
 static const char *const TAG = "epson_projector.sensor";
 
 void EpsonSensor::setup() {
+  ESP_LOGD(TAG, "Setting up sensor type %d", static_cast<int>(this->sensor_type_));
   if (!setup_entity(this, TAG)) {
     return;
   }
+  ESP_LOGD(TAG, "Sensor setup complete, callback registered");
 }
 
 void EpsonSensor::dump_config() {

@@ -7,9 +7,11 @@ namespace esphome::epson_projector {
 static const char *const TAG = "epson_projector.binary_sensor";
 
 void EpsonBinarySensor::setup() {
+  ESP_LOGD(TAG, "Setting up binary sensor type %d", static_cast<int>(this->sensor_type_));
   if (!setup_entity(this, TAG)) {
     return;
   }
+  ESP_LOGD(TAG, "Binary sensor setup complete, callback registered");
 }
 
 void EpsonBinarySensor::dump_config() {
