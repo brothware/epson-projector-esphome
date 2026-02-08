@@ -42,28 +42,16 @@ static constexpr const char *ARG_OFF_NUMERIC = "00";
 static constexpr const char *RESPONSE_OK = ":";
 static constexpr const char *RESPONSE_ERR = "ERR";
 
-static constexpr int BRIGHTNESS_MIN = 0;
+static constexpr int PROJECTOR_RAW_MAX = 255;
+
 static constexpr int BRIGHTNESS_MAX = 100;
-static constexpr int CONTRAST_MIN = 0;
 static constexpr int CONTRAST_MAX = 100;
-static constexpr int VOLUME_MIN = 0;
 static constexpr int VOLUME_MAX = 20;
-
-static constexpr int PROJECTOR_BRIGHTNESS_MAX = 255;
-static constexpr int PROJECTOR_CONTRAST_MAX = 255;
-
-static constexpr int SHARPNESS_MIN = 0;
-static constexpr int SHARPNESS_MAX = 15;
-static constexpr int DENSITY_MIN = -32;
-static constexpr int DENSITY_MAX = 32;
-static constexpr int TINT_MIN = -32;
-static constexpr int TINT_MAX = 32;
-static constexpr int COLOR_TEMP_MIN = 0;
-static constexpr int COLOR_TEMP_MAX = 9;
-static constexpr int VKEYSTONE_MIN = -30;
-static constexpr int VKEYSTONE_MAX = 30;
-static constexpr int HKEYSTONE_MIN = -30;
-static constexpr int HKEYSTONE_MAX = 30;
+static constexpr int SHARPNESS_MAX = 20;
+static constexpr int DENSITY_MAX = 100;
+static constexpr int TINT_MAX = 100;
+static constexpr int COLOR_TEMP_MAX = 13;
+static constexpr int KEYSTONE_MAX = 60;
 
 enum class PowerState : uint8_t {
   STANDBY = 0,
