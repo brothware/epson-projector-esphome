@@ -4,7 +4,6 @@
 
 #include <algorithm>
 #include <ranges>
-#include <utility>
 
 namespace esphome::epson_projector {
 
@@ -83,7 +82,7 @@ void EpsonProjector::update() {
 
 void EpsonProjector::dump_config() {
   ESP_LOGCONFIG(TAG, "Epson Projector:");
-  ESP_LOGCONFIG(TAG, "  Power State: %d", std::to_underlying(this->power_state_));
+  ESP_LOGCONFIG(TAG, "  Power State: %d", compat::to_underlying(this->power_state_));
   ESP_LOGCONFIG(TAG, "  Lamp Hours: %u", this->lamp_hours_);
 }
 
@@ -240,7 +239,7 @@ void EpsonProjector::set_freeze(bool freeze) {
 void EpsonProjector::query(QueryType type) {
   const QueryInfo *info = find_query_info(type);
   if (info == nullptr) {
-    ESP_LOGW(TAG, "Unknown query type: %d", std::to_underlying(type));
+    ESP_LOGW(TAG, "Unknown query type: %d", compat::to_underlying(type));
     return;
   }
   std::string cmd = build_query_command(info->cmd);
@@ -285,7 +284,8 @@ void EpsonProjector::handle_response(const std::string &response) {
       [this](auto &&arg) {
         using T = std::decay_t<decltype(arg)>;
         if constexpr (std::is_same_v<T, PowerResponse>) {
-          ESP_LOGD(TAG, "Power state: %d -> %d", std::to_underlying(this->power_state_), std::to_underlying(arg.state));
+          ESP_LOGD(TAG, "Power state: %d -> %d", compat::to_underlying(this->power_state_),
+                   compat::to_underlying(arg.state));
           this->power_state_ = arg.state;
           this->notify_state_change();
         } else if constexpr (std::is_same_v<T, LampResponse>) {

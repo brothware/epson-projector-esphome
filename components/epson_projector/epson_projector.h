@@ -5,6 +5,7 @@
 
 #include "command.h"
 #include "command_queue.h"
+#include "cpp23_compat.h"
 #include "protocol_constants.h"
 #include "query_metadata.h"
 #include "response_parser.h"
@@ -12,7 +13,6 @@
 #include <cstdint>
 #include <functional>
 #include <string>
-#include <utility>
 #include <vector>
 
 namespace esphome::epson_projector {
@@ -73,9 +73,9 @@ class EpsonProjector : public uart::UARTDevice, public PollingComponent {
   using StateCallback = std::function<void()>;
   void add_on_state_callback(StateCallback callback) { state_callbacks_.push_back(std::move(callback)); }
 
-  void register_query(QueryType type) { registered_queries_ |= (1 << std::to_underlying(type)); }
+  void register_query(QueryType type) { registered_queries_ |= (1 << compat::to_underlying(type)); }
   [[nodiscard]] bool has_query(QueryType type) const {
-    return (registered_queries_ & (1 << std::to_underlying(type))) != 0;
+    return (registered_queries_ & (1 << compat::to_underlying(type))) != 0;
   }
 
  protected:
