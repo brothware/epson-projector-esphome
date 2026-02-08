@@ -12,31 +12,31 @@ void EpsonNumber::setup() {
   }
   switch (this->number_type_) {
     case NumberType::BRIGHTNESS:
-      this->parent_->register_query(EpsonProjector::QueryType::BRIGHTNESS);
+      this->parent_->register_query(QueryType::BRIGHTNESS);
       break;
     case NumberType::CONTRAST:
-      this->parent_->register_query(EpsonProjector::QueryType::CONTRAST);
+      this->parent_->register_query(QueryType::CONTRAST);
       break;
     case NumberType::VOLUME:
-      this->parent_->register_query(EpsonProjector::QueryType::VOLUME);
+      this->parent_->register_query(QueryType::VOLUME);
       break;
     case NumberType::SHARPNESS:
-      this->parent_->register_query(EpsonProjector::QueryType::SHARPNESS);
+      this->parent_->register_query(QueryType::SHARPNESS);
       break;
     case NumberType::DENSITY:
-      this->parent_->register_query(EpsonProjector::QueryType::DENSITY);
+      this->parent_->register_query(QueryType::DENSITY);
       break;
     case NumberType::TINT:
-      this->parent_->register_query(EpsonProjector::QueryType::TINT);
+      this->parent_->register_query(QueryType::TINT);
       break;
     case NumberType::COLOR_TEMPERATURE:
-      this->parent_->register_query(EpsonProjector::QueryType::COLOR_TEMP);
+      this->parent_->register_query(QueryType::COLOR_TEMP);
       break;
     case NumberType::V_KEYSTONE:
-      this->parent_->register_query(EpsonProjector::QueryType::V_KEYSTONE);
+      this->parent_->register_query(QueryType::V_KEYSTONE);
       break;
     case NumberType::H_KEYSTONE:
-      this->parent_->register_query(EpsonProjector::QueryType::H_KEYSTONE);
+      this->parent_->register_query(QueryType::H_KEYSTONE);
       break;
   }
 }

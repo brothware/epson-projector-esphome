@@ -26,19 +26,19 @@ void EpsonSelect::setup() {
 
   switch (this->select_type_) {
     case SelectType::SOURCE:
-      this->parent_->register_query(EpsonProjector::QueryType::SOURCE);
+      this->parent_->register_query(QueryType::SOURCE);
       break;
     case SelectType::COLOR_MODE:
-      this->parent_->register_query(EpsonProjector::QueryType::COLOR_MODE);
+      this->parent_->register_query(QueryType::COLOR_MODE);
       break;
     case SelectType::ASPECT_RATIO:
-      this->parent_->register_query(EpsonProjector::QueryType::ASPECT_RATIO);
+      this->parent_->register_query(QueryType::ASPECT_RATIO);
       break;
     case SelectType::LUMINANCE:
-      this->parent_->register_query(EpsonProjector::QueryType::LUMINANCE);
+      this->parent_->register_query(QueryType::LUMINANCE);
       break;
     case SelectType::GAMMA:
-      this->parent_->register_query(EpsonProjector::QueryType::GAMMA);
+      this->parent_->register_query(QueryType::GAMMA);
       break;
   }
 

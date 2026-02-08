@@ -12,19 +12,19 @@ void EpsonSwitch::setup() {
   }
   switch (this->switch_type_) {
     case SwitchType::POWER:
-      this->parent_->register_query(EpsonProjector::QueryType::POWER);
+      this->parent_->register_query(QueryType::POWER);
       break;
     case SwitchType::MUTE:
-      this->parent_->register_query(EpsonProjector::QueryType::MUTE);
+      this->parent_->register_query(QueryType::MUTE);
       break;
     case SwitchType::H_REVERSE:
-      this->parent_->register_query(EpsonProjector::QueryType::H_REVERSE);
+      this->parent_->register_query(QueryType::H_REVERSE);
       break;
     case SwitchType::V_REVERSE:
-      this->parent_->register_query(EpsonProjector::QueryType::V_REVERSE);
+      this->parent_->register_query(QueryType::V_REVERSE);
       break;
     case SwitchType::FREEZE:
-      this->parent_->register_query(EpsonProjector::QueryType::FREEZE);
+      this->parent_->register_query(QueryType::FREEZE);
       break;
   }
 }

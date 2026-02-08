@@ -68,73 +68,15 @@ bool EpsonProjector::is_busy_state() const {
 }
 
 void EpsonProjector::update() {
-  if (this->has_query(QueryType::POWER)) {
-    this->query_power();
-  }
-  if (this->power_state_ == PowerState::ON) {
-    if (this->has_query(QueryType::LAMP_HOURS)) {
-      this->query_lamp_hours();
+  bool is_on = (this->power_state_ == PowerState::ON);
+  for (const auto &info : QUERY_TABLE) {
+    if (!this->has_query(info.type)) {
+      continue;
     }
-    if (this->has_query(QueryType::ERROR_CODE)) {
-      this->query_error();
+    if (info.requires_power_on && !is_on) {
+      continue;
     }
-    if (this->has_query(QueryType::SOURCE)) {
-      this->query_source();
-    }
-    if (this->has_query(QueryType::MUTE)) {
-      this->query_mute();
-    }
-    if (this->has_query(QueryType::BRIGHTNESS)) {
-      this->query_brightness();
-    }
-    if (this->has_query(QueryType::CONTRAST)) {
-      this->query_contrast();
-    }
-    if (this->has_query(QueryType::VOLUME)) {
-      this->query_volume();
-    }
-    if (this->has_query(QueryType::COLOR_MODE)) {
-      this->query_color_mode();
-    }
-    if (this->has_query(QueryType::ASPECT_RATIO)) {
-      this->query_aspect_ratio();
-    }
-    if (this->has_query(QueryType::SHARPNESS)) {
-      this->query_sharpness();
-    }
-    if (this->has_query(QueryType::DENSITY)) {
-      this->query_density();
-    }
-    if (this->has_query(QueryType::TINT)) {
-      this->query_tint();
-    }
-    if (this->has_query(QueryType::COLOR_TEMP)) {
-      this->query_color_temp();
-    }
-    if (this->has_query(QueryType::V_KEYSTONE)) {
-      this->query_v_keystone();
-    }
-    if (this->has_query(QueryType::H_KEYSTONE)) {
-      this->query_h_keystone();
-    }
-    if (this->has_query(QueryType::H_REVERSE)) {
-      this->query_h_reverse();
-    }
-    if (this->has_query(QueryType::V_REVERSE)) {
-      this->query_v_reverse();
-    }
-    if (this->has_query(QueryType::LUMINANCE)) {
-      this->query_luminance();
-    }
-    if (this->has_query(QueryType::GAMMA)) {
-      this->query_gamma();
-    }
-    if (this->has_query(QueryType::FREEZE)) {
-      this->query_freeze();
-    }
-    if (this->has_query(QueryType::SERIAL_NUMBER)) {
-      this->query_serial_number();
-    }
+    this->query(info.type);
   }
 }
 
@@ -352,113 +294,13 @@ void EpsonProjector::set_freeze(bool freeze) {
   });
 }
 
-void EpsonProjector::query_power() {
-  std::string cmd = build_query_command(CMD_POWER);
-  this->send_command(cmd, CommandType::QUERY);
-}
-
-void EpsonProjector::query_lamp_hours() {
-  std::string cmd = build_query_command(CMD_LAMP);
-  this->send_command(cmd, CommandType::QUERY);
-}
-
-void EpsonProjector::query_error() {
-  std::string cmd = build_query_command(CMD_ERROR);
-  this->send_command(cmd, CommandType::QUERY);
-}
-
-void EpsonProjector::query_source() {
-  std::string cmd = build_query_command(CMD_SOURCE);
-  this->send_command(cmd, CommandType::QUERY);
-}
-
-void EpsonProjector::query_mute() {
-  std::string cmd = build_query_command(CMD_MUTE);
-  this->send_command(cmd, CommandType::QUERY);
-}
-
-void EpsonProjector::query_volume() {
-  std::string cmd = build_query_command(CMD_VOLUME);
-  this->send_command(cmd, CommandType::QUERY);
-}
-
-void EpsonProjector::query_brightness() {
-  std::string cmd = build_query_command(CMD_BRIGHTNESS);
-  this->send_command(cmd, CommandType::QUERY);
-}
-
-void EpsonProjector::query_contrast() {
-  std::string cmd = build_query_command(CMD_CONTRAST);
-  this->send_command(cmd, CommandType::QUERY);
-}
-
-void EpsonProjector::query_color_mode() {
-  std::string cmd = build_query_command(CMD_COLOR_MODE);
-  this->send_command(cmd, CommandType::QUERY);
-}
-
-void EpsonProjector::query_aspect_ratio() {
-  std::string cmd = build_query_command(CMD_ASPECT);
-  this->send_command(cmd, CommandType::QUERY);
-}
-
-void EpsonProjector::query_sharpness() {
-  std::string cmd = build_query_command(CMD_SHARPNESS);
-  this->send_command(cmd, CommandType::QUERY);
-}
-
-void EpsonProjector::query_density() {
-  std::string cmd = build_query_command(CMD_DENSITY);
-  this->send_command(cmd, CommandType::QUERY);
-}
-
-void EpsonProjector::query_tint() {
-  std::string cmd = build_query_command(CMD_TINT);
-  this->send_command(cmd, CommandType::QUERY);
-}
-
-void EpsonProjector::query_color_temp() {
-  std::string cmd = build_query_command(CMD_COLOR_TEMP);
-  this->send_command(cmd, CommandType::QUERY);
-}
-
-void EpsonProjector::query_v_keystone() {
-  std::string cmd = build_query_command(CMD_VKEYSTONE);
-  this->send_command(cmd, CommandType::QUERY);
-}
-
-void EpsonProjector::query_h_keystone() {
-  std::string cmd = build_query_command(CMD_HKEYSTONE);
-  this->send_command(cmd, CommandType::QUERY);
-}
-
-void EpsonProjector::query_h_reverse() {
-  std::string cmd = build_query_command(CMD_HREVERSE);
-  this->send_command(cmd, CommandType::QUERY);
-}
-
-void EpsonProjector::query_v_reverse() {
-  std::string cmd = build_query_command(CMD_VREVERSE);
-  this->send_command(cmd, CommandType::QUERY);
-}
-
-void EpsonProjector::query_luminance() {
-  std::string cmd = build_query_command(CMD_LUMINANCE);
-  this->send_command(cmd, CommandType::QUERY);
-}
-
-void EpsonProjector::query_gamma() {
-  std::string cmd = build_query_command(CMD_GAMMA);
-  this->send_command(cmd, CommandType::QUERY);
-}
-
-void EpsonProjector::query_freeze() {
-  std::string cmd = build_query_command(CMD_FREEZE);
-  this->send_command(cmd, CommandType::QUERY);
-}
-
-void EpsonProjector::query_serial_number() {
-  std::string cmd = build_query_command(CMD_SERIAL);
+void EpsonProjector::query(QueryType type) {
+  const QueryInfo *info = find_query_info(type);
+  if (info == nullptr) {
+    ESP_LOGW(TAG, "Unknown query type: %d", static_cast<int>(type));
+    return;
+  }
+  std::string cmd = build_query_command(info->cmd);
   this->send_command(cmd, CommandType::QUERY);
 }
 

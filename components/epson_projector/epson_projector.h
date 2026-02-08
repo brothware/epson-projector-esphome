@@ -6,6 +6,7 @@
 #include "command.h"
 #include "command_queue.h"
 #include "protocol_constants.h"
+#include "query_metadata.h"
 #include "response_parser.h"
 
 #include <cstdint>
@@ -43,28 +44,7 @@ class EpsonProjector : public uart::UARTDevice, public PollingComponent {
   void set_gamma(const std::string &mode_code);
   void set_freeze(bool freeze);
 
-  void query_power();
-  void query_lamp_hours();
-  void query_error();
-  void query_source();
-  void query_mute();
-  void query_volume();
-  void query_brightness();
-  void query_contrast();
-  void query_color_mode();
-  void query_aspect_ratio();
-  void query_sharpness();
-  void query_density();
-  void query_tint();
-  void query_color_temp();
-  void query_v_keystone();
-  void query_h_keystone();
-  void query_h_reverse();
-  void query_v_reverse();
-  void query_luminance();
-  void query_gamma();
-  void query_freeze();
-  void query_serial_number();
+  void query(QueryType type);
 
   [[nodiscard]] PowerState power_state() const { return power_state_; }
   [[nodiscard]] bool is_muted() const { return muted_; }
@@ -92,32 +72,8 @@ class EpsonProjector : public uart::UARTDevice, public PollingComponent {
   using StateCallback = std::function<void()>;
   void add_on_state_callback(StateCallback callback) { state_callbacks_.push_back(std::move(callback)); }
 
-  enum class QueryType : uint8_t {
-    POWER,
-    LAMP_HOURS,
-    ERROR_CODE,
-    SOURCE,
-    MUTE,
-    VOLUME,
-    BRIGHTNESS,
-    CONTRAST,
-    COLOR_MODE,
-    ASPECT_RATIO,
-    SHARPNESS,
-    DENSITY,
-    TINT,
-    COLOR_TEMP,
-    V_KEYSTONE,
-    H_KEYSTONE,
-    H_REVERSE,
-    V_REVERSE,
-    LUMINANCE,
-    GAMMA,
-    FREEZE,
-    SERIAL_NUMBER,
-  };
-  void register_query(QueryType type) { registered_queries_ |= (1 << static_cast<uint16_t>(type)); }
-  bool has_query(QueryType type) const { return (registered_queries_ & (1 << static_cast<uint16_t>(type))) != 0; }
+  void register_query(QueryType type) { registered_queries_ |= (1 << static_cast<uint32_t>(type)); }
+  bool has_query(QueryType type) const { return (registered_queries_ & (1 << static_cast<uint32_t>(type))) != 0; }
 
  protected:
   void send_command(const std::string &cmd, CommandType type,
@@ -161,7 +117,7 @@ class EpsonProjector : public uart::UARTDevice, public PollingComponent {
   static constexpr uint32_t BUSY_TIMEOUT_MS = 10000;
 
   std::vector<StateCallback> state_callbacks_;
-  uint16_t registered_queries_{0};
+  uint32_t registered_queries_{0};
 };
 
 }  // namespace esphome::epson_projector

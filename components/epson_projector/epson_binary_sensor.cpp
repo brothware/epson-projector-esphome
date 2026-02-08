@@ -13,10 +13,10 @@ void EpsonBinarySensor::setup() {
   }
   switch (this->sensor_type_) {
     case BinarySensorType::POWER_STATE:
-      this->parent_->register_query(EpsonProjector::QueryType::POWER);
+      this->parent_->register_query(QueryType::POWER);
       break;
     case BinarySensorType::MUTE_STATE:
-      this->parent_->register_query(EpsonProjector::QueryType::MUTE);
+      this->parent_->register_query(QueryType::MUTE);
       break;
   }
   ESP_LOGD(TAG, "Binary sensor setup complete, callback registered");

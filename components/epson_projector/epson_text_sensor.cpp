@@ -12,7 +12,7 @@ void EpsonTextSensor::setup() {
   }
   switch (this->sensor_type_) {
     case TextSensorType::SERIAL_NUMBER:
-      this->parent_->register_query(EpsonProjector::QueryType::SERIAL_NUMBER);
+      this->parent_->register_query(QueryType::SERIAL_NUMBER);
       break;
   }
 }
