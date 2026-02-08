@@ -86,9 +86,42 @@ void EpsonProjector::dump_config() {
   ESP_LOGCONFIG(TAG, "  Lamp Hours: %u", this->lamp_hours_);
 }
 
+void EpsonProjector::send_int_command(const char *cmd, int min_val, int max_val, int value,
+                                      int EpsonProjector::*member) {
+  int clamped = clamp_value(value, min_val, max_val);
+  std::string cmd_str = build_set_command(cmd, clamped);
+  this->send_command(cmd_str, CommandType::SET, [this, member, clamped](bool success, const std::string &) {
+    if (success) {
+      this->*member = clamped;
+      this->notify_state_change();
+    }
+  });
+}
+
+void EpsonProjector::send_bool_command(const char *cmd, bool value, bool EpsonProjector::*member) {
+  std::string cmd_str = build_set_command(cmd, value ? ARG_ON : ARG_OFF);
+  this->send_command(cmd_str, CommandType::SET, [this, member, value](bool success, const std::string &) {
+    if (success) {
+      this->*member = value;
+      this->notify_state_change();
+    }
+  });
+}
+
+void EpsonProjector::send_string_command(const char *cmd, const std::string &value,
+                                         std::string EpsonProjector::*member) {
+  std::string cmd_str = build_set_command(cmd, value.c_str());
+  this->send_command(cmd_str, CommandType::SET, [this, member, value](bool success, const std::string &) {
+    if (success) {
+      this->*member = value;
+      this->notify_state_change();
+    }
+  });
+}
+
 void EpsonProjector::set_power(bool on) {
   std::string cmd = on ? build_power_on_command() : build_power_off_command();
-  this->send_command(cmd, CommandType::SET, [this, on](bool success, const std::string & /*response*/) {
+  this->send_command(cmd, CommandType::SET, [this, on](bool success, const std::string &) {
     if (success) {
       this->power_state_ = on ? PowerState::WARMUP : PowerState::COOLDOWN;
       this->notify_state_change();
@@ -98,7 +131,7 @@ void EpsonProjector::set_power(bool on) {
 
 void EpsonProjector::set_mute(bool mute) {
   std::string cmd = build_mute_command(mute);
-  this->send_command(cmd, CommandType::SET, [this, mute](bool success, const std::string & /*response*/) {
+  this->send_command(cmd, CommandType::SET, [this, mute](bool success, const std::string &) {
     if (success) {
       this->muted_ = mute;
       this->notify_state_change();
@@ -115,7 +148,7 @@ void EpsonProjector::set_source(const std::string &source_code) {
   if (cmd.empty()) {
     return;
   }
-  this->send_command(cmd, CommandType::SET, [this, source_code](bool success, const std::string & /*response*/) {
+  this->send_command(cmd, CommandType::SET, [this, source_code](bool success, const std::string &) {
     if (success) {
       this->current_source_ = source_code;
       this->notify_state_change();
@@ -124,14 +157,7 @@ void EpsonProjector::set_source(const std::string &source_code) {
 }
 
 void EpsonProjector::set_volume(int volume) {
-  int clamped = clamp_value(volume, VOLUME_MIN, VOLUME_MAX);
-  std::string cmd = build_set_command(CMD_VOLUME, clamped);
-  this->send_command(cmd, CommandType::SET, [this, clamped](bool success, const std::string & /*response*/) {
-    if (success) {
-      this->volume_ = clamped;
-      this->notify_state_change();
-    }
-  });
+  this->send_int_command(CMD_VOLUME, VOLUME_MIN, VOLUME_MAX, volume, &EpsonProjector::volume_);
 }
 
 void EpsonProjector::set_brightness(int brightness) {
@@ -159,139 +185,55 @@ void EpsonProjector::set_contrast(int contrast) {
 }
 
 void EpsonProjector::set_color_mode(const std::string &mode_code) {
-  std::string cmd = build_set_command(CMD_COLOR_MODE, mode_code.c_str());
-  this->send_command(cmd, CommandType::SET, [this, mode_code](bool success, const std::string &) {
-    if (success) {
-      this->current_color_mode_ = mode_code;
-      this->notify_state_change();
-    }
-  });
+  this->send_string_command(CMD_COLOR_MODE, mode_code, &EpsonProjector::current_color_mode_);
 }
 
 void EpsonProjector::set_aspect_ratio(const std::string &ratio_code) {
-  std::string cmd = build_set_command(CMD_ASPECT, ratio_code.c_str());
-  this->send_command(cmd, CommandType::SET, [this, ratio_code](bool success, const std::string &) {
-    if (success) {
-      this->current_aspect_ratio_ = ratio_code;
-      this->notify_state_change();
-    }
-  });
+  this->send_string_command(CMD_ASPECT, ratio_code, &EpsonProjector::current_aspect_ratio_);
 }
 
 void EpsonProjector::set_sharpness(int value) {
-  int clamped = clamp_value(value, SHARPNESS_MIN, SHARPNESS_MAX);
-  std::string cmd = build_set_command(CMD_SHARPNESS, clamped);
-  this->send_command(cmd, CommandType::SET, [this, clamped](bool success, const std::string &) {
-    if (success) {
-      this->sharpness_ = clamped;
-      this->notify_state_change();
-    }
-  });
+  this->send_int_command(CMD_SHARPNESS, SHARPNESS_MIN, SHARPNESS_MAX, value, &EpsonProjector::sharpness_);
 }
 
 void EpsonProjector::set_density(int value) {
-  int clamped = clamp_value(value, DENSITY_MIN, DENSITY_MAX);
-  std::string cmd = build_set_command(CMD_DENSITY, clamped);
-  this->send_command(cmd, CommandType::SET, [this, clamped](bool success, const std::string &) {
-    if (success) {
-      this->density_ = clamped;
-      this->notify_state_change();
-    }
-  });
+  this->send_int_command(CMD_DENSITY, DENSITY_MIN, DENSITY_MAX, value, &EpsonProjector::density_);
 }
 
 void EpsonProjector::set_tint(int value) {
-  int clamped = clamp_value(value, TINT_MIN, TINT_MAX);
-  std::string cmd = build_set_command(CMD_TINT, clamped);
-  this->send_command(cmd, CommandType::SET, [this, clamped](bool success, const std::string &) {
-    if (success) {
-      this->tint_ = clamped;
-      this->notify_state_change();
-    }
-  });
+  this->send_int_command(CMD_TINT, TINT_MIN, TINT_MAX, value, &EpsonProjector::tint_);
 }
 
 void EpsonProjector::set_color_temp(int value) {
-  int clamped = clamp_value(value, COLOR_TEMP_MIN, COLOR_TEMP_MAX);
-  std::string cmd = build_set_command(CMD_COLOR_TEMP, clamped);
-  this->send_command(cmd, CommandType::SET, [this, clamped](bool success, const std::string &) {
-    if (success) {
-      this->color_temp_ = clamped;
-      this->notify_state_change();
-    }
-  });
+  this->send_int_command(CMD_COLOR_TEMP, COLOR_TEMP_MIN, COLOR_TEMP_MAX, value, &EpsonProjector::color_temp_);
 }
 
 void EpsonProjector::set_v_keystone(int value) {
-  int clamped = clamp_value(value, VKEYSTONE_MIN, VKEYSTONE_MAX);
-  std::string cmd = build_set_command(CMD_VKEYSTONE, clamped);
-  this->send_command(cmd, CommandType::SET, [this, clamped](bool success, const std::string &) {
-    if (success) {
-      this->v_keystone_ = clamped;
-      this->notify_state_change();
-    }
-  });
+  this->send_int_command(CMD_VKEYSTONE, VKEYSTONE_MIN, VKEYSTONE_MAX, value, &EpsonProjector::v_keystone_);
 }
 
 void EpsonProjector::set_h_keystone(int value) {
-  int clamped = clamp_value(value, HKEYSTONE_MIN, HKEYSTONE_MAX);
-  std::string cmd = build_set_command(CMD_HKEYSTONE, clamped);
-  this->send_command(cmd, CommandType::SET, [this, clamped](bool success, const std::string &) {
-    if (success) {
-      this->h_keystone_ = clamped;
-      this->notify_state_change();
-    }
-  });
+  this->send_int_command(CMD_HKEYSTONE, HKEYSTONE_MIN, HKEYSTONE_MAX, value, &EpsonProjector::h_keystone_);
 }
 
 void EpsonProjector::set_h_reverse(bool reverse) {
-  std::string cmd = build_set_command(CMD_HREVERSE, reverse ? ARG_ON : ARG_OFF);
-  this->send_command(cmd, CommandType::SET, [this, reverse](bool success, const std::string &) {
-    if (success) {
-      this->h_reverse_ = reverse;
-      this->notify_state_change();
-    }
-  });
+  this->send_bool_command(CMD_HREVERSE, reverse, &EpsonProjector::h_reverse_);
 }
 
 void EpsonProjector::set_v_reverse(bool reverse) {
-  std::string cmd = build_set_command(CMD_VREVERSE, reverse ? ARG_ON : ARG_OFF);
-  this->send_command(cmd, CommandType::SET, [this, reverse](bool success, const std::string &) {
-    if (success) {
-      this->v_reverse_ = reverse;
-      this->notify_state_change();
-    }
-  });
+  this->send_bool_command(CMD_VREVERSE, reverse, &EpsonProjector::v_reverse_);
 }
 
 void EpsonProjector::set_luminance(const std::string &mode_code) {
-  std::string cmd = build_set_command(CMD_LUMINANCE, mode_code.c_str());
-  this->send_command(cmd, CommandType::SET, [this, mode_code](bool success, const std::string &) {
-    if (success) {
-      this->current_luminance_ = mode_code;
-      this->notify_state_change();
-    }
-  });
+  this->send_string_command(CMD_LUMINANCE, mode_code, &EpsonProjector::current_luminance_);
 }
 
 void EpsonProjector::set_gamma(const std::string &mode_code) {
-  std::string cmd = build_set_command(CMD_GAMMA, mode_code.c_str());
-  this->send_command(cmd, CommandType::SET, [this, mode_code](bool success, const std::string &) {
-    if (success) {
-      this->current_gamma_ = mode_code;
-      this->notify_state_change();
-    }
-  });
+  this->send_string_command(CMD_GAMMA, mode_code, &EpsonProjector::current_gamma_);
 }
 
 void EpsonProjector::set_freeze(bool freeze) {
-  std::string cmd = build_set_command(CMD_FREEZE, freeze ? ARG_ON : ARG_OFF);
-  this->send_command(cmd, CommandType::SET, [this, freeze](bool success, const std::string &) {
-    if (success) {
-      this->frozen_ = freeze;
-      this->notify_state_change();
-    }
-  });
+  this->send_bool_command(CMD_FREEZE, freeze, &EpsonProjector::frozen_);
 }
 
 void EpsonProjector::query(QueryType type) {

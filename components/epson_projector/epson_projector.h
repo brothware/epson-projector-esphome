@@ -84,6 +84,10 @@ class EpsonProjector : public uart::UARTDevice, public PollingComponent {
   std::string format_response_for_log(const std::string &response);
   bool is_busy_state() const;
 
+  void send_int_command(const char *cmd, int min_val, int max_val, int value, int EpsonProjector::*member);
+  void send_bool_command(const char *cmd, bool value, bool EpsonProjector::*member);
+  void send_string_command(const char *cmd, const std::string &value, std::string EpsonProjector::*member);
+
   CommandQueue command_queue_;
   ResponseParser response_parser_;
   std::string rx_buffer_;
