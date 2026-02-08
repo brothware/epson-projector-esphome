@@ -82,4 +82,4 @@ def test_eh_tw7100_model(models_module):
     assert "HDMI1" in model["sources"]
     assert "HDMI2" in model["sources"]
     assert model["features"]["power"] is True
-    assert model["features"]["luminance"] is True
+    assert model["features"]["luminance"]
