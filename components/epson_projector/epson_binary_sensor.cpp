@@ -25,6 +25,10 @@ void EpsonBinarySensor::dump_config() {
 }
 
 void EpsonBinarySensor::on_state_change() {
+  const auto *info = find_binary_sensor_type_info(this->sensor_type_);
+  if (info == nullptr || !this->parent_->has_received(info->query_type)) {
+    return;
+  }
   bool state = false;
   switch (this->sensor_type_) {
     case BinarySensorType::POWER_STATE:

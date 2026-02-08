@@ -25,6 +25,10 @@ void EpsonSensor::dump_config() {
 }
 
 void EpsonSensor::on_state_change() {
+  const auto *info = find_sensor_type_info(this->sensor_type_);
+  if (info == nullptr || !this->parent_->has_received(info->query_type)) {
+    return;
+  }
   float value = NAN;
   switch (this->sensor_type_) {
     case SensorType::LAMP_HOURS:

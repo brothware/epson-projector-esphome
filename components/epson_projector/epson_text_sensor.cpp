@@ -23,6 +23,10 @@ void EpsonTextSensor::dump_config() {
 }
 
 void EpsonTextSensor::on_state_change() {
+  const auto *info = find_text_sensor_type_info(this->sensor_type_);
+  if (info == nullptr || !this->parent_->has_received(info->query_type)) {
+    return;
+  }
   std::string value;
   switch (this->sensor_type_) {
     case TextSensorType::SERIAL_NUMBER:

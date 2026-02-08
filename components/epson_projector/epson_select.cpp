@@ -74,6 +74,10 @@ void EpsonSelect::control(const std::string &value) {
 }
 
 void EpsonSelect::on_state_change() {
+  const auto *info = find_select_type_info(this->select_type_);
+  if (info == nullptr || !this->parent_->has_received(info->query_type)) {
+    return;
+  }
   std::string current;
   switch (this->select_type_) {
     case SelectType::SOURCE:

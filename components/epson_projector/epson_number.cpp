@@ -57,6 +57,10 @@ void EpsonNumber::control(float value) {
 }
 
 void EpsonNumber::on_state_change() {
+  const auto *info = find_number_type_info(this->number_type_);
+  if (info == nullptr || !this->parent_->has_received(info->query_type)) {
+    return;
+  }
   float value = 0;
   switch (this->number_type_) {
     case NumberType::BRIGHTNESS:

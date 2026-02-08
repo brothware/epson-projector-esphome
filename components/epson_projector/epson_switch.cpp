@@ -43,6 +43,10 @@ void EpsonSwitch::write_state(bool state) {
 }
 
 void EpsonSwitch::on_state_change() {
+  const auto *info = find_switch_type_info(this->switch_type_);
+  if (info == nullptr || !this->parent_->has_received(info->query_type)) {
+    return;
+  }
   bool state = false;
   switch (this->switch_type_) {
     case SwitchType::POWER:
