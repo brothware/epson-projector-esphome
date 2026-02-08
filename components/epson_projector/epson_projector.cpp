@@ -123,6 +123,12 @@ void EpsonProjector::update() {
     if (this->has_query(QueryType::V_REVERSE)) {
       this->query_v_reverse();
     }
+    if (this->has_query(QueryType::LUMINANCE)) {
+      this->query_luminance();
+    }
+    if (this->has_query(QueryType::GAMMA)) {
+      this->query_gamma();
+    }
   }
 }
 
@@ -310,6 +316,26 @@ void EpsonProjector::set_v_reverse(bool reverse) {
   });
 }
 
+void EpsonProjector::set_luminance(const std::string &mode_code) {
+  std::string cmd = build_set_command(CMD_LUMINANCE, mode_code.c_str());
+  this->send_command(cmd, CommandType::SET, [this, mode_code](bool success, const std::string &) {
+    if (success) {
+      this->current_luminance_ = mode_code;
+      this->notify_state_change();
+    }
+  });
+}
+
+void EpsonProjector::set_gamma(const std::string &mode_code) {
+  std::string cmd = build_set_command(CMD_GAMMA, mode_code.c_str());
+  this->send_command(cmd, CommandType::SET, [this, mode_code](bool success, const std::string &) {
+    if (success) {
+      this->current_gamma_ = mode_code;
+      this->notify_state_change();
+    }
+  });
+}
+
 void EpsonProjector::query_power() {
   std::string cmd = build_query_command(CMD_POWER);
   this->send_command(cmd, CommandType::QUERY);
@@ -397,6 +423,16 @@ void EpsonProjector::query_h_reverse() {
 
 void EpsonProjector::query_v_reverse() {
   std::string cmd = build_query_command(CMD_VREVERSE);
+  this->send_command(cmd, CommandType::QUERY);
+}
+
+void EpsonProjector::query_luminance() {
+  std::string cmd = build_query_command(CMD_LUMINANCE);
+  this->send_command(cmd, CommandType::QUERY);
+}
+
+void EpsonProjector::query_gamma() {
+  std::string cmd = build_query_command(CMD_GAMMA);
   this->send_command(cmd, CommandType::QUERY);
 }
 
@@ -503,6 +539,14 @@ void EpsonProjector::handle_response(const std::string &response) {
         } else if constexpr (std::is_same_v<T, VReverseResponse>) {
           ESP_LOGD(TAG, "V Reverse: %s", arg.reversed ? "ON" : "OFF");
           this->v_reverse_ = arg.reversed;
+          this->notify_state_change();
+        } else if constexpr (std::is_same_v<T, LuminanceResponse>) {
+          ESP_LOGD(TAG, "Luminance: %s", arg.mode_code.c_str());
+          this->current_luminance_ = arg.mode_code;
+          this->notify_state_change();
+        } else if constexpr (std::is_same_v<T, GammaResponse>) {
+          ESP_LOGD(TAG, "Gamma: %s", arg.mode_code.c_str());
+          this->current_gamma_ = arg.mode_code;
           this->notify_state_change();
         } else if constexpr (std::is_same_v<T, NumericResponse>) {
           ESP_LOGD(TAG, "Numeric response: %d", arg.value);

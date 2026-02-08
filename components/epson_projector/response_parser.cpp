@@ -135,6 +135,14 @@ std::optional<ParseResult> ResponseParser::parse_key_value(const std::string &ke
     return VReverseResponse{value == ARG_ON || value == "01"};
   }
 
+  if (key == CMD_LUMINANCE) {
+    return LuminanceResponse{value};
+  }
+
+  if (key == CMD_GAMMA) {
+    return GammaResponse{value};
+  }
+
   return StringResponse{value};
 }
 

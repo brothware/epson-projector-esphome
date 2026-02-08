@@ -8,15 +8,21 @@ from . import epson_projector_ns
 from .const import (
     CONF_ASPECT_RATIO,
     CONF_COLOR_MODE,
+    CONF_GAMMA,
+    CONF_LUMINANCE,
     CONF_MODEL,
     CONF_SOURCE,
     ICON_ASPECT,
     ICON_COLOR_MODE,
+    ICON_GAMMA,
+    ICON_LUMINANCE,
     ICON_SOURCE,
 )
 from .models import (
     get_aspect_ratios_for_model,
     get_color_modes_for_model,
+    get_gamma_options_for_model,
+    get_luminance_options_for_model,
     get_sources_for_model,
 )
 from .platform_helpers import get_projector_parent, projector_platform_schema
@@ -30,6 +36,8 @@ SELECT_TYPES = {
     CONF_SOURCE: SelectType.SOURCE,
     CONF_COLOR_MODE: SelectType.COLOR_MODE,
     CONF_ASPECT_RATIO: SelectType.ASPECT_RATIO,
+    CONF_LUMINANCE: SelectType.LUMINANCE,
+    CONF_GAMMA: SelectType.GAMMA,
 }
 
 CONFIG_SCHEMA = projector_platform_schema(
@@ -49,6 +57,16 @@ CONFIG_SCHEMA = projector_platform_schema(
             icon=ICON_ASPECT,
             entity_category=ENTITY_CATEGORY_CONFIG,
         ),
+        cv.Optional(CONF_LUMINANCE): select.select_schema(
+            EpsonSelect,
+            icon=ICON_LUMINANCE,
+            entity_category=ENTITY_CATEGORY_CONFIG,
+        ),
+        cv.Optional(CONF_GAMMA): select.select_schema(
+            EpsonSelect,
+            icon=ICON_GAMMA,
+            entity_category=ENTITY_CATEGORY_CONFIG,
+        ),
     }
 )
 
@@ -62,6 +80,8 @@ async def to_code(config):
         CONF_SOURCE: get_sources_for_model(model_id),
         CONF_COLOR_MODE: get_color_modes_for_model(model_id),
         CONF_ASPECT_RATIO: get_aspect_ratios_for_model(model_id),
+        CONF_LUMINANCE: get_luminance_options_for_model(model_id),
+        CONF_GAMMA: get_gamma_options_for_model(model_id),
     }
 
     for key, select_type in SELECT_TYPES.items():

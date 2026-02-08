@@ -20,6 +20,8 @@ CONF_V_KEYSTONE = "v_keystone"
 CONF_H_KEYSTONE = "h_keystone"
 CONF_H_REVERSE = "h_reverse"
 CONF_V_REVERSE = "v_reverse"
+CONF_LUMINANCE = "luminance"
+CONF_GAMMA = "gamma"
 
 ICON_PROJECTOR = "mdi:projector"
 ICON_LAMP = "mdi:lightbulb-on"
@@ -39,6 +41,8 @@ ICON_V_KEYSTONE = "mdi:angle-acute"
 ICON_H_KEYSTONE = "mdi:angle-acute"
 ICON_H_REVERSE = "mdi:flip-horizontal"
 ICON_V_REVERSE = "mdi:flip-vertical"
+ICON_LUMINANCE = "mdi:brightness-auto"
+ICON_GAMMA = "mdi:gamma"
 
 BRIGHTNESS_MIN = 0
 BRIGHTNESS_MAX = 100

@@ -78,6 +78,10 @@ select:
       name: "Color Mode"
     aspect_ratio:
       name: "Aspect Ratio"
+    luminance:
+      name: "Luminance"
+    gamma:
+      name: "Gamma"
 
 number:
   - platform: epson_projector

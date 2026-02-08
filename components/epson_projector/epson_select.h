@@ -16,6 +16,8 @@ enum class SelectType : uint8_t {
   SOURCE,
   COLOR_MODE,
   ASPECT_RATIO,
+  LUMINANCE,
+  GAMMA,
 };
 
 class EpsonSelect : public select::Select, public Component, public Parented<EpsonProjector> {

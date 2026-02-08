@@ -39,6 +39,8 @@ class EpsonProjector : public uart::UARTDevice, public PollingComponent {
   void set_h_keystone(int value);
   void set_h_reverse(bool reverse);
   void set_v_reverse(bool reverse);
+  void set_luminance(const std::string &mode_code);
+  void set_gamma(const std::string &mode_code);
 
   void query_power();
   void query_lamp_hours();
@@ -58,6 +60,8 @@ class EpsonProjector : public uart::UARTDevice, public PollingComponent {
   void query_h_keystone();
   void query_h_reverse();
   void query_v_reverse();
+  void query_luminance();
+  void query_gamma();
 
   [[nodiscard]] PowerState power_state() const { return power_state_; }
   [[nodiscard]] bool is_muted() const { return muted_; }
@@ -77,6 +81,8 @@ class EpsonProjector : public uart::UARTDevice, public PollingComponent {
   [[nodiscard]] int h_keystone() const { return h_keystone_; }
   [[nodiscard]] bool h_reverse() const { return h_reverse_; }
   [[nodiscard]] bool v_reverse() const { return v_reverse_; }
+  [[nodiscard]] const std::string &current_luminance() const { return current_luminance_; }
+  [[nodiscard]] const std::string &current_gamma() const { return current_gamma_; }
 
   using StateCallback = std::function<void()>;
   void add_on_state_callback(StateCallback callback) { state_callbacks_.push_back(std::move(callback)); }
@@ -100,6 +106,8 @@ class EpsonProjector : public uart::UARTDevice, public PollingComponent {
     H_KEYSTONE,
     H_REVERSE,
     V_REVERSE,
+    LUMINANCE,
+    GAMMA,
   };
   void register_query(QueryType type) { registered_queries_ |= (1 << static_cast<uint16_t>(type)); }
   bool has_query(QueryType type) const { return (registered_queries_ & (1 << static_cast<uint16_t>(type))) != 0; }
@@ -135,6 +143,8 @@ class EpsonProjector : public uart::UARTDevice, public PollingComponent {
   int h_keystone_{0};
   bool h_reverse_{false};
   bool v_reverse_{false};
+  std::string current_luminance_;
+  std::string current_gamma_;
 
   uint32_t last_command_time_{0};
   static constexpr uint32_t COMMAND_DELAY_MS = 500;

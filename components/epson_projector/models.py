@@ -17,7 +17,8 @@ class Features(TypedDict, total=False):
     aspect_ratios: dict[str, str]
     keystone_vertical: bool
     keystone_horizontal: bool
-    luminance: bool
+    luminance: dict[str, str] | bool
+    gamma: dict[str, str] | bool
 
 
 class ProjectorModel(TypedDict):
@@ -163,6 +164,21 @@ ASPECT_RATIOS_BUSINESS = {
     "Zoom": "50",
 }
 
+LUMINANCE_OPTIONS = {
+    "High": "00",
+    "Low": "01",
+    "Medium": "02",
+}
+
+GAMMA_OPTIONS = {
+    "2.0": "20",
+    "2.1": "21",
+    "2.2": "22",
+    "2.3": "23",
+    "2.4": "24",
+    "Custom": "F0",
+}
+
 
 def _home_cinema(
     name: str,
@@ -180,7 +196,8 @@ def _home_cinema(
             **FEATURES_BASE,
             "color_modes": modes,
             "aspect_ratios": aspect_ratios,
-            "luminance": True,
+            "luminance": LUMINANCE_OPTIONS,
+            "gamma": GAMMA_OPTIONS,
         },
     }
 
@@ -429,6 +446,8 @@ PROJECTOR_MODELS: dict[str, ProjectorModel] = {
             **FEATURES_BASE,
             "color_modes": COLOR_MODE_CODES,
             "aspect_ratios": ASPECT_RATIO_CODES,
+            "luminance": LUMINANCE_OPTIONS,
+            "gamma": GAMMA_OPTIONS,
         },
     },
 }
@@ -468,3 +487,23 @@ def get_aspect_ratios_for_model(model_id: str) -> dict[str, str]:
     if model is None:
         return {}
     return model["features"].get("aspect_ratios", {})
+
+
+def get_luminance_options_for_model(model_id: str) -> dict[str, str]:
+    model = get_model(model_id)
+    if model is None:
+        return {}
+    luminance = model["features"].get("luminance", {})
+    if isinstance(luminance, dict):
+        return luminance
+    return LUMINANCE_OPTIONS if luminance else {}
+
+
+def get_gamma_options_for_model(model_id: str) -> dict[str, str]:
+    model = get_model(model_id)
+    if model is None:
+        return {}
+    gamma = model["features"].get("gamma", {})
+    if isinstance(gamma, dict):
+        return gamma
+    return GAMMA_OPTIONS if gamma else {}

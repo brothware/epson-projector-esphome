@@ -234,4 +234,36 @@ TEST_F(ResponseParserTest, ParsesVReverseOff) {
   EXPECT_FALSE(vr->reversed);
 }
 
+TEST_F(ResponseParserTest, ParsesLuminanceHigh) {
+  auto result = parser.parse("LUMINANCE=00\r:");
+  ASSERT_TRUE(result.has_value());
+  auto *lum = std::get_if<LuminanceResponse>(&*result);
+  ASSERT_NE(lum, nullptr);
+  EXPECT_EQ(lum->mode_code, "00");
+}
+
+TEST_F(ResponseParserTest, ParsesLuminanceLow) {
+  auto result = parser.parse("LUMINANCE=01\r:");
+  ASSERT_TRUE(result.has_value());
+  auto *lum = std::get_if<LuminanceResponse>(&*result);
+  ASSERT_NE(lum, nullptr);
+  EXPECT_EQ(lum->mode_code, "01");
+}
+
+TEST_F(ResponseParserTest, ParsesGamma) {
+  auto result = parser.parse("GAMMA=22\r:");
+  ASSERT_TRUE(result.has_value());
+  auto *gamma = std::get_if<GammaResponse>(&*result);
+  ASSERT_NE(gamma, nullptr);
+  EXPECT_EQ(gamma->mode_code, "22");
+}
+
+TEST_F(ResponseParserTest, ParsesGammaCustom) {
+  auto result = parser.parse("GAMMA=F0\r:");
+  ASSERT_TRUE(result.has_value());
+  auto *gamma = std::get_if<GammaResponse>(&*result);
+  ASSERT_NE(gamma, nullptr);
+  EXPECT_EQ(gamma->mode_code, "F0");
+}
+
 }  // namespace esphome::epson_projector

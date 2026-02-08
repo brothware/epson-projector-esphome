@@ -34,6 +34,12 @@ void EpsonSelect::setup() {
     case SelectType::ASPECT_RATIO:
       this->parent_->register_query(EpsonProjector::QueryType::ASPECT_RATIO);
       break;
+    case SelectType::LUMINANCE:
+      this->parent_->register_query(EpsonProjector::QueryType::LUMINANCE);
+      break;
+    case SelectType::GAMMA:
+      this->parent_->register_query(EpsonProjector::QueryType::GAMMA);
+      break;
   }
 
   if (!this->option_names_.empty()) {
@@ -59,6 +65,12 @@ void EpsonSelect::dump_config() {
     case SelectType::ASPECT_RATIO:
       type_str = "Aspect Ratio";
       break;
+    case SelectType::LUMINANCE:
+      type_str = "Luminance";
+      break;
+    case SelectType::GAMMA:
+      type_str = "Gamma";
+      break;
   }
   ESP_LOGCONFIG(TAG, "  Type: %s", type_str);
 }
@@ -81,6 +93,12 @@ void EpsonSelect::control(const std::string &value) {
     case SelectType::ASPECT_RATIO:
       this->parent_->set_aspect_ratio(code);
       break;
+    case SelectType::LUMINANCE:
+      this->parent_->set_luminance(code);
+      break;
+    case SelectType::GAMMA:
+      this->parent_->set_gamma(code);
+      break;
   }
   this->publish_state(value);
 }
@@ -96,6 +114,12 @@ void EpsonSelect::on_state_change() {
       break;
     case SelectType::ASPECT_RATIO:
       current = this->parent_->current_aspect_ratio();
+      break;
+    case SelectType::LUMINANCE:
+      current = this->parent_->current_luminance();
+      break;
+    case SelectType::GAMMA:
+      current = this->parent_->current_gamma();
       break;
   }
 

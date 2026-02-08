@@ -81,6 +81,14 @@ struct VReverseResponse {
   bool reversed;
 };
 
+struct LuminanceResponse {
+  std::string mode_code;
+};
+
+struct GammaResponse {
+  std::string mode_code;
+};
+
 struct NumericResponse {
   int value;
 };
@@ -99,7 +107,8 @@ using ParseResult =
     std::variant<PowerResponse, LampResponse, ErrorResponse, SourceResponse, MuteResponse, VolumeResponse,
                  BrightnessResponse, ContrastResponse, ColorModeResponse, AspectRatioResponse, SharpnessResponse,
                  DensityResponse, TintResponse, ColorTempResponse, VKeystoneResponse, HKeystoneResponse,
-                 HReverseResponse, VReverseResponse, NumericResponse, StringResponse, AckResponse, ErrorResult>;
+                 HReverseResponse, VReverseResponse, LuminanceResponse, GammaResponse, NumericResponse, StringResponse,
+                 AckResponse, ErrorResult>;
 
 class ResponseParser {
  public:
