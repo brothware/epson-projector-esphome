@@ -24,19 +24,19 @@ jobs:
         run: pytest tests/ -v --ignore=tests/cpp
 
   cpp-tests:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install Google Test
+      - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y libgtest-dev cmake
+          sudo apt-get install -y cmake g++-13
 
       - name: Build and run tests
         run: |
           cd tests/cpp
           mkdir -p build && cd build
-          cmake ..
+          cmake .. -DCMAKE_CXX_COMPILER=g++-13
           make
           ctest --output-on-failure
