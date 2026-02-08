@@ -31,6 +31,7 @@ void EpsonSensor::on_state_change() {
   switch (this->sensor_type_) {
     case SensorType::LAMP_HOURS:
       value = static_cast<float>(this->parent_->lamp_hours());
+      ESP_LOGD(TAG, "Publishing lamp hours: %.0f", value);
       break;
     case SensorType::ERROR_CODE:
       value = static_cast<float>(this->parent_->error_code());

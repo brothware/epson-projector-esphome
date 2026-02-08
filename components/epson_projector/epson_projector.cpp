@@ -205,18 +205,22 @@ void EpsonProjector::handle_response(const std::string &response) {
       [this, &success](auto &&arg) {
         using T = std::decay_t<decltype(arg)>;
         if constexpr (std::is_same_v<T, PowerResponse>) {
+          ESP_LOGD(TAG, "Power state: %d -> %d", static_cast<int>(this->power_state_), static_cast<int>(arg.state));
           this->power_state_ = arg.state;
           this->notify_state_change();
         } else if constexpr (std::is_same_v<T, LampResponse>) {
+          ESP_LOGD(TAG, "Lamp hours: %u", arg.hours);
           this->lamp_hours_ = arg.hours;
           this->notify_state_change();
         } else if constexpr (std::is_same_v<T, ErrorResponse>) {
           this->error_code_ = arg.code;
           this->notify_state_change();
         } else if constexpr (std::is_same_v<T, SourceResponse>) {
+          ESP_LOGD(TAG, "Source: %s", arg.source_code.c_str());
           this->current_source_ = arg.source_code;
           this->notify_state_change();
         } else if constexpr (std::is_same_v<T, MuteResponse>) {
+          ESP_LOGD(TAG, "Mute: %s", arg.muted ? "ON" : "OFF");
           this->muted_ = arg.muted;
           this->notify_state_change();
         } else if constexpr (std::is_same_v<T, NumericResponse>) {
@@ -237,6 +241,7 @@ void EpsonProjector::handle_response(const std::string &response) {
 }
 
 void EpsonProjector::notify_state_change() {
+  ESP_LOGV(TAG, "Notifying %d callbacks", this->state_callbacks_.size());
   for (auto &callback : this->state_callbacks_) {
     callback();
   }
