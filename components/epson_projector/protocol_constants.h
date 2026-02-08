@@ -36,6 +36,8 @@ static constexpr const char *CMD_FREEZE = "FREEZE";
 
 static constexpr const char *ARG_ON = "ON";
 static constexpr const char *ARG_OFF = "OFF";
+static constexpr const char *ARG_ON_NUMERIC = "01";
+static constexpr const char *ARG_OFF_NUMERIC = "00";
 
 static constexpr const char *RESPONSE_OK = ":";
 static constexpr const char *RESPONSE_ERR = "ERR";

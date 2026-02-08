@@ -2,8 +2,33 @@
 
 #include <algorithm>
 #include <cctype>
+#include <stdexcept>
 
 namespace esphome::epson_projector {
+
+namespace {
+
+std::optional<int> safe_stoi(const std::string &str) {
+  try {
+    return std::stoi(str);
+  } catch (const std::exception &) {
+    return std::nullopt;
+  }
+}
+
+std::optional<uint32_t> safe_stoul(const std::string &str) {
+  try {
+    return static_cast<uint32_t>(std::stoul(str));
+  } catch (const std::exception &) {
+    return std::nullopt;
+  }
+}
+
+bool is_bool_true(const std::string &value) {
+  return value == ARG_ON || value == ARG_ON_NUMERIC;
+}
+
+}  // namespace
 
 bool ResponseParser::is_complete_response(const std::string &buffer) const {
   return !buffer.empty() && buffer.back() == RESPONSE_PROMPT;
@@ -41,9 +66,12 @@ std::optional<ParseResult> ResponseParser::parse(const std::string &response) {
 
 std::optional<ParseResult> ResponseParser::parse_key_value(const std::string &key, const std::string &value) {
   if (key == CMD_POWER) {
-    int state_val = std::stoi(value);
+    auto state_val = safe_stoi(value);
+    if (!state_val) {
+      return ErrorResult{"Invalid power state value: " + value};
+    }
     PowerState state;
-    switch (state_val) {
+    switch (*state_val) {
       case 0:
         state = PowerState::STANDBY;
         break;
@@ -64,11 +92,19 @@ std::optional<ParseResult> ResponseParser::parse_key_value(const std::string &ke
   }
 
   if (key == CMD_LAMP) {
-    return LampResponse{static_cast<uint32_t>(std::stoul(value))};
+    auto hours = safe_stoul(value);
+    if (!hours) {
+      return ErrorResult{"Invalid lamp hours value: " + value};
+    }
+    return LampResponse{*hours};
   }
 
   if (key == CMD_ERROR) {
-    return ErrorResponse{static_cast<uint8_t>(std::stoi(value))};
+    auto code = safe_stoi(value);
+    if (!code) {
+      return ErrorResult{"Invalid error code value: " + value};
+    }
+    return ErrorResponse{static_cast<uint8_t>(*code)};
   }
 
   if (key == CMD_SOURCE) {
@@ -76,22 +112,32 @@ std::optional<ParseResult> ResponseParser::parse_key_value(const std::string &ke
   }
 
   if (key == CMD_MUTE) {
-    return MuteResponse{value == ARG_ON || value == "01"};
+    return MuteResponse{is_bool_true(value)};
   }
 
   if (key == CMD_VOLUME) {
-    return VolumeResponse{std::stoi(value)};
+    auto vol = safe_stoi(value);
+    if (!vol) {
+      return ErrorResult{"Invalid volume value: " + value};
+    }
+    return VolumeResponse{*vol};
   }
 
   if (key == CMD_BRIGHTNESS) {
-    int raw_value = std::stoi(value);
-    int scaled = (raw_value * BRIGHTNESS_MAX) / PROJECTOR_BRIGHTNESS_MAX;
+    auto raw_value = safe_stoi(value);
+    if (!raw_value) {
+      return ErrorResult{"Invalid brightness value: " + value};
+    }
+    int scaled = (*raw_value * BRIGHTNESS_MAX) / PROJECTOR_BRIGHTNESS_MAX;
     return BrightnessResponse{scaled};
   }
 
   if (key == CMD_CONTRAST) {
-    int raw_value = std::stoi(value);
-    int scaled = (raw_value * CONTRAST_MAX) / PROJECTOR_CONTRAST_MAX;
+    auto raw_value = safe_stoi(value);
+    if (!raw_value) {
+      return ErrorResult{"Invalid contrast value: " + value};
+    }
+    int scaled = (*raw_value * CONTRAST_MAX) / PROJECTOR_CONTRAST_MAX;
     return ContrastResponse{scaled};
   }
 
@@ -104,35 +150,59 @@ std::optional<ParseResult> ResponseParser::parse_key_value(const std::string &ke
   }
 
   if (key == CMD_SHARPNESS) {
-    return SharpnessResponse{std::stoi(value)};
+    auto val = safe_stoi(value);
+    if (!val) {
+      return ErrorResult{"Invalid sharpness value: " + value};
+    }
+    return SharpnessResponse{*val};
   }
 
   if (key == CMD_DENSITY) {
-    return DensityResponse{std::stoi(value)};
+    auto val = safe_stoi(value);
+    if (!val) {
+      return ErrorResult{"Invalid density value: " + value};
+    }
+    return DensityResponse{*val};
   }
 
   if (key == CMD_TINT) {
-    return TintResponse{std::stoi(value)};
+    auto val = safe_stoi(value);
+    if (!val) {
+      return ErrorResult{"Invalid tint value: " + value};
+    }
+    return TintResponse{*val};
   }
 
   if (key == CMD_COLOR_TEMP) {
-    return ColorTempResponse{std::stoi(value)};
+    auto val = safe_stoi(value);
+    if (!val) {
+      return ErrorResult{"Invalid color temperature value: " + value};
+    }
+    return ColorTempResponse{*val};
   }
 
   if (key == CMD_VKEYSTONE) {
-    return VKeystoneResponse{std::stoi(value)};
+    auto val = safe_stoi(value);
+    if (!val) {
+      return ErrorResult{"Invalid vertical keystone value: " + value};
+    }
+    return VKeystoneResponse{*val};
   }
 
   if (key == CMD_HKEYSTONE) {
-    return HKeystoneResponse{std::stoi(value)};
+    auto val = safe_stoi(value);
+    if (!val) {
+      return ErrorResult{"Invalid horizontal keystone value: " + value};
+    }
+    return HKeystoneResponse{*val};
   }
 
   if (key == CMD_HREVERSE) {
-    return HReverseResponse{value == ARG_ON || value == "01"};
+    return HReverseResponse{is_bool_true(value)};
   }
 
   if (key == CMD_VREVERSE) {
-    return VReverseResponse{value == ARG_ON || value == "01"};
+    return VReverseResponse{is_bool_true(value)};
   }
 
   if (key == CMD_LUMINANCE) {
@@ -144,7 +214,7 @@ std::optional<ParseResult> ResponseParser::parse_key_value(const std::string &ke
   }
 
   if (key == CMD_FREEZE) {
-    return FreezeResponse{value == ARG_ON || value == "01"};
+    return FreezeResponse{is_bool_true(value)};
   }
 
   if (key == CMD_SERIAL) {

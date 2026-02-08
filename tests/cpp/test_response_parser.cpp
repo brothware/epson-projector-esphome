@@ -290,4 +290,162 @@ TEST_F(ResponseParserTest, ParsesSerialNumber) {
   EXPECT_EQ(sno->serial, "ABC123456");
 }
 
+TEST_F(ResponseParserTest, HandlesMalformedPowerValue) {
+  auto result = parser.parse("PWR=abc\r:");
+  ASSERT_TRUE(result.has_value());
+  auto *error = std::get_if<ErrorResult>(&*result);
+  ASSERT_NE(error, nullptr);
+  EXPECT_TRUE(error->message.find("Invalid power state") != std::string::npos);
+}
+
+TEST_F(ResponseParserTest, HandlesMalformedLampHours) {
+  auto result = parser.parse("LAMP=xyz\r:");
+  ASSERT_TRUE(result.has_value());
+  auto *error = std::get_if<ErrorResult>(&*result);
+  ASSERT_NE(error, nullptr);
+  EXPECT_TRUE(error->message.find("Invalid lamp hours") != std::string::npos);
+}
+
+TEST_F(ResponseParserTest, HandlesMalformedVolume) {
+  auto result = parser.parse("VOL=not_a_number\r:");
+  ASSERT_TRUE(result.has_value());
+  auto *error = std::get_if<ErrorResult>(&*result);
+  ASSERT_NE(error, nullptr);
+  EXPECT_TRUE(error->message.find("Invalid volume") != std::string::npos);
+}
+
+TEST_F(ResponseParserTest, HandlesMalformedBrightness) {
+  auto result = parser.parse("BRIGHT=invalid\r:");
+  ASSERT_TRUE(result.has_value());
+  auto *error = std::get_if<ErrorResult>(&*result);
+  ASSERT_NE(error, nullptr);
+  EXPECT_TRUE(error->message.find("Invalid brightness") != std::string::npos);
+}
+
+TEST_F(ResponseParserTest, HandlesMalformedSharpness) {
+  auto result = parser.parse("SHARP=bad\r:");
+  ASSERT_TRUE(result.has_value());
+  auto *error = std::get_if<ErrorResult>(&*result);
+  ASSERT_NE(error, nullptr);
+  EXPECT_TRUE(error->message.find("Invalid sharpness") != std::string::npos);
+}
+
+TEST_F(ResponseParserTest, HandlesMalformedVKeystone) {
+  auto result = parser.parse("VKEYSTONE=wrong\r:");
+  ASSERT_TRUE(result.has_value());
+  auto *error = std::get_if<ErrorResult>(&*result);
+  ASSERT_NE(error, nullptr);
+  EXPECT_TRUE(error->message.find("Invalid vertical keystone") != std::string::npos);
+}
+
+TEST_F(ResponseParserTest, HandlesEmptyValue) {
+  auto result = parser.parse("VOL=\r:");
+  ASSERT_TRUE(result.has_value());
+  auto *error = std::get_if<ErrorResult>(&*result);
+  EXPECT_NE(error, nullptr);
+}
+
+TEST_F(ResponseParserTest, HandlesLargeLampHours) {
+  auto result = parser.parse("LAMP=65535\r:");
+  ASSERT_TRUE(result.has_value());
+  auto *lamp = std::get_if<LampResponse>(&*result);
+  ASSERT_NE(lamp, nullptr);
+  EXPECT_EQ(lamp->hours, 65535u);
+}
+
+TEST_F(ResponseParserTest, ParsesBrightnessScalingZero) {
+  auto result = parser.parse("BRIGHT=0\r:");
+  ASSERT_TRUE(result.has_value());
+  auto *bright = std::get_if<BrightnessResponse>(&*result);
+  ASSERT_NE(bright, nullptr);
+  EXPECT_EQ(bright->value, 0);
+}
+
+TEST_F(ResponseParserTest, ParsesBrightnessScalingMax) {
+  auto result = parser.parse("BRIGHT=255\r:");
+  ASSERT_TRUE(result.has_value());
+  auto *bright = std::get_if<BrightnessResponse>(&*result);
+  ASSERT_NE(bright, nullptr);
+  EXPECT_EQ(bright->value, 100);
+}
+
+TEST_F(ResponseParserTest, ParsesBrightnessScalingMid) {
+  auto result = parser.parse("BRIGHT=127\r:");
+  ASSERT_TRUE(result.has_value());
+  auto *bright = std::get_if<BrightnessResponse>(&*result);
+  ASSERT_NE(bright, nullptr);
+  EXPECT_EQ(bright->value, 49);
+}
+
+TEST_F(ResponseParserTest, ParsesContrastScalingMax) {
+  auto result = parser.parse("CONTRAST=255\r:");
+  ASSERT_TRUE(result.has_value());
+  auto *contrast = std::get_if<ContrastResponse>(&*result);
+  ASSERT_NE(contrast, nullptr);
+  EXPECT_EQ(contrast->value, 100);
+}
+
+TEST_F(ResponseParserTest, ParsesMuteNumericOn) {
+  auto result = parser.parse("MUTE=01\r:");
+  ASSERT_TRUE(result.has_value());
+  auto *mute = std::get_if<MuteResponse>(&*result);
+  ASSERT_NE(mute, nullptr);
+  EXPECT_TRUE(mute->muted);
+}
+
+TEST_F(ResponseParserTest, ParsesMuteNumericOff) {
+  auto result = parser.parse("MUTE=00\r:");
+  ASSERT_TRUE(result.has_value());
+  auto *mute = std::get_if<MuteResponse>(&*result);
+  ASSERT_NE(mute, nullptr);
+  EXPECT_FALSE(mute->muted);
+}
+
+TEST_F(ResponseParserTest, ParsesHReverseNumericOn) {
+  auto result = parser.parse("HREVERSE=01\r:");
+  ASSERT_TRUE(result.has_value());
+  auto *hr = std::get_if<HReverseResponse>(&*result);
+  ASSERT_NE(hr, nullptr);
+  EXPECT_TRUE(hr->reversed);
+}
+
+TEST_F(ResponseParserTest, ParsesFreezeNumericOn) {
+  auto result = parser.parse("FREEZE=01\r:");
+  ASSERT_TRUE(result.has_value());
+  auto *freeze = std::get_if<FreezeResponse>(&*result);
+  ASSERT_NE(freeze, nullptr);
+  EXPECT_TRUE(freeze->frozen);
+}
+
+TEST_F(ResponseParserTest, ParsesUnknownPowerState) {
+  auto result = parser.parse("PWR=99\r:");
+  ASSERT_TRUE(result.has_value());
+  auto *power = std::get_if<PowerResponse>(&*result);
+  ASSERT_NE(power, nullptr);
+  EXPECT_EQ(power->state, PowerState::UNKNOWN);
+}
+
+TEST_F(ResponseParserTest, ParsesUnknownKey) {
+  auto result = parser.parse("UNKNOWN=somevalue\r:");
+  ASSERT_TRUE(result.has_value());
+  auto *str = std::get_if<StringResponse>(&*result);
+  ASSERT_NE(str, nullptr);
+  EXPECT_EQ(str->value, "somevalue");
+}
+
+TEST_F(ResponseParserTest, HandlesWhitespaceInResponse) {
+  auto result = parser.parse("PWR=01\r\n:");
+  ASSERT_TRUE(result.has_value());
+  auto *power = std::get_if<PowerResponse>(&*result);
+  ASSERT_NE(power, nullptr);
+  EXPECT_EQ(power->state, PowerState::ON);
+}
+
+TEST_F(ResponseParserTest, ParsesEmptyResponse) {
+  auto result = parser.parse("");
+  ASSERT_TRUE(result.has_value());
+  auto *error = std::get_if<ErrorResult>(&*result);
+  EXPECT_NE(error, nullptr);
+}
+
 }  // namespace esphome::epson_projector
