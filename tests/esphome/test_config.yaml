@@ -3,7 +3,10 @@ esphome:
   friendly_name: Epson Projector Test
   platformio_options:
     build_flags:
+      - "-std=gnu++23"
       - "-Werror"
+    build_unflags:
+      - "-std=gnu++20"
 
 esp32:
   board: esp32dev
