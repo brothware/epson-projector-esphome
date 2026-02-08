@@ -31,6 +31,10 @@ class EpsonProjector : public uart::UARTDevice, public PollingComponent {
   void set_contrast(int contrast);
   void set_color_mode(const std::string &mode_code);
   void set_aspect_ratio(const std::string &ratio_code);
+  void set_sharpness(int value);
+  void set_density(int value);
+  void set_tint(int value);
+  void set_color_temp(int value);
 
   void query_power();
   void query_lamp_hours();
@@ -42,6 +46,10 @@ class EpsonProjector : public uart::UARTDevice, public PollingComponent {
   void query_contrast();
   void query_color_mode();
   void query_aspect_ratio();
+  void query_sharpness();
+  void query_density();
+  void query_tint();
+  void query_color_temp();
 
   [[nodiscard]] PowerState power_state() const { return power_state_; }
   [[nodiscard]] bool is_muted() const { return muted_; }
@@ -53,6 +61,10 @@ class EpsonProjector : public uart::UARTDevice, public PollingComponent {
   [[nodiscard]] int contrast() const { return contrast_; }
   [[nodiscard]] const std::string &current_color_mode() const { return current_color_mode_; }
   [[nodiscard]] const std::string &current_aspect_ratio() const { return current_aspect_ratio_; }
+  [[nodiscard]] int sharpness() const { return sharpness_; }
+  [[nodiscard]] int density() const { return density_; }
+  [[nodiscard]] int tint() const { return tint_; }
+  [[nodiscard]] int color_temp() const { return color_temp_; }
 
   using StateCallback = std::function<void()>;
   void add_on_state_callback(StateCallback callback) { state_callbacks_.push_back(std::move(callback)); }
@@ -68,6 +80,10 @@ class EpsonProjector : public uart::UARTDevice, public PollingComponent {
     CONTRAST,
     COLOR_MODE,
     ASPECT_RATIO,
+    SHARPNESS,
+    DENSITY,
+    TINT,
+    COLOR_TEMP,
   };
   void register_query(QueryType type) { registered_queries_ |= (1 << static_cast<uint16_t>(type)); }
   bool has_query(QueryType type) const { return (registered_queries_ & (1 << static_cast<uint16_t>(type))) != 0; }
@@ -95,6 +111,10 @@ class EpsonProjector : public uart::UARTDevice, public PollingComponent {
   int volume_{0};
   int brightness_{0};
   int contrast_{0};
+  int sharpness_{0};
+  int density_{0};
+  int tint_{0};
+  int color_temp_{0};
 
   uint32_t last_command_time_{0};
   static constexpr uint32_t COMMAND_DELAY_MS = 500;

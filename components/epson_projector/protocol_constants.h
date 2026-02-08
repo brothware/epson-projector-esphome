@@ -49,6 +49,15 @@ static constexpr int VOLUME_MAX = 20;
 static constexpr int PROJECTOR_BRIGHTNESS_MAX = 255;
 static constexpr int PROJECTOR_CONTRAST_MAX = 255;
 
+static constexpr int SHARPNESS_MIN = 0;
+static constexpr int SHARPNESS_MAX = 15;
+static constexpr int DENSITY_MIN = -32;
+static constexpr int DENSITY_MAX = 32;
+static constexpr int TINT_MIN = -32;
+static constexpr int TINT_MAX = 32;
+static constexpr int COLOR_TEMP_MIN = 0;
+static constexpr int COLOR_TEMP_MAX = 9;
+
 enum class PowerState : uint8_t {
   STANDBY = 0,
   ON = 1,

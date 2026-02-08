@@ -103,7 +103,23 @@ std::optional<ParseResult> ResponseParser::parse_key_value(const std::string &ke
     return AspectRatioResponse{value};
   }
 
-  if (key == CMD_DENSITY || key == CMD_TINT || key == CMD_SHARPNESS || key == CMD_VKEYSTONE || key == CMD_HKEYSTONE) {
+  if (key == CMD_SHARPNESS) {
+    return SharpnessResponse{std::stoi(value)};
+  }
+
+  if (key == CMD_DENSITY) {
+    return DensityResponse{std::stoi(value)};
+  }
+
+  if (key == CMD_TINT) {
+    return TintResponse{std::stoi(value)};
+  }
+
+  if (key == CMD_COLOR_TEMP) {
+    return ColorTempResponse{std::stoi(value)};
+  }
+
+  if (key == CMD_VKEYSTONE || key == CMD_HKEYSTONE) {
     return NumericResponse{std::stoi(value)};
   }
 

@@ -99,6 +99,18 @@ void EpsonProjector::update() {
     if (this->has_query(QueryType::ASPECT_RATIO)) {
       this->query_aspect_ratio();
     }
+    if (this->has_query(QueryType::SHARPNESS)) {
+      this->query_sharpness();
+    }
+    if (this->has_query(QueryType::DENSITY)) {
+      this->query_density();
+    }
+    if (this->has_query(QueryType::TINT)) {
+      this->query_tint();
+    }
+    if (this->has_query(QueryType::COLOR_TEMP)) {
+      this->query_color_temp();
+    }
   }
 }
 
@@ -200,6 +212,50 @@ void EpsonProjector::set_aspect_ratio(const std::string &ratio_code) {
   });
 }
 
+void EpsonProjector::set_sharpness(int value) {
+  int clamped = clamp_value(value, SHARPNESS_MIN, SHARPNESS_MAX);
+  std::string cmd = build_set_command(CMD_SHARPNESS, clamped);
+  this->send_command(cmd, CommandType::SET, [this, clamped](bool success, const std::string &) {
+    if (success) {
+      this->sharpness_ = clamped;
+      this->notify_state_change();
+    }
+  });
+}
+
+void EpsonProjector::set_density(int value) {
+  int clamped = clamp_value(value, DENSITY_MIN, DENSITY_MAX);
+  std::string cmd = build_set_command(CMD_DENSITY, clamped);
+  this->send_command(cmd, CommandType::SET, [this, clamped](bool success, const std::string &) {
+    if (success) {
+      this->density_ = clamped;
+      this->notify_state_change();
+    }
+  });
+}
+
+void EpsonProjector::set_tint(int value) {
+  int clamped = clamp_value(value, TINT_MIN, TINT_MAX);
+  std::string cmd = build_set_command(CMD_TINT, clamped);
+  this->send_command(cmd, CommandType::SET, [this, clamped](bool success, const std::string &) {
+    if (success) {
+      this->tint_ = clamped;
+      this->notify_state_change();
+    }
+  });
+}
+
+void EpsonProjector::set_color_temp(int value) {
+  int clamped = clamp_value(value, COLOR_TEMP_MIN, COLOR_TEMP_MAX);
+  std::string cmd = build_set_command(CMD_COLOR_TEMP, clamped);
+  this->send_command(cmd, CommandType::SET, [this, clamped](bool success, const std::string &) {
+    if (success) {
+      this->color_temp_ = clamped;
+      this->notify_state_change();
+    }
+  });
+}
+
 void EpsonProjector::query_power() {
   std::string cmd = build_query_command(CMD_POWER);
   this->send_command(cmd, CommandType::QUERY);
@@ -247,6 +303,26 @@ void EpsonProjector::query_color_mode() {
 
 void EpsonProjector::query_aspect_ratio() {
   std::string cmd = build_query_command(CMD_ASPECT);
+  this->send_command(cmd, CommandType::QUERY);
+}
+
+void EpsonProjector::query_sharpness() {
+  std::string cmd = build_query_command(CMD_SHARPNESS);
+  this->send_command(cmd, CommandType::QUERY);
+}
+
+void EpsonProjector::query_density() {
+  std::string cmd = build_query_command(CMD_DENSITY);
+  this->send_command(cmd, CommandType::QUERY);
+}
+
+void EpsonProjector::query_tint() {
+  std::string cmd = build_query_command(CMD_TINT);
+  this->send_command(cmd, CommandType::QUERY);
+}
+
+void EpsonProjector::query_color_temp() {
+  std::string cmd = build_query_command(CMD_COLOR_TEMP);
   this->send_command(cmd, CommandType::QUERY);
 }
 
@@ -321,6 +397,22 @@ void EpsonProjector::handle_response(const std::string &response) {
         } else if constexpr (std::is_same_v<T, AspectRatioResponse>) {
           ESP_LOGD(TAG, "Aspect ratio: %s", arg.ratio_code.c_str());
           this->current_aspect_ratio_ = arg.ratio_code;
+          this->notify_state_change();
+        } else if constexpr (std::is_same_v<T, SharpnessResponse>) {
+          ESP_LOGD(TAG, "Sharpness: %d", arg.value);
+          this->sharpness_ = arg.value;
+          this->notify_state_change();
+        } else if constexpr (std::is_same_v<T, DensityResponse>) {
+          ESP_LOGD(TAG, "Density: %d", arg.value);
+          this->density_ = arg.value;
+          this->notify_state_change();
+        } else if constexpr (std::is_same_v<T, TintResponse>) {
+          ESP_LOGD(TAG, "Tint: %d", arg.value);
+          this->tint_ = arg.value;
+          this->notify_state_change();
+        } else if constexpr (std::is_same_v<T, ColorTempResponse>) {
+          ESP_LOGD(TAG, "Color temperature: %d", arg.value);
+          this->color_temp_ = arg.value;
           this->notify_state_change();
         } else if constexpr (std::is_same_v<T, NumericResponse>) {
           ESP_LOGD(TAG, "Numeric response: %d", arg.value);

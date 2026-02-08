@@ -20,6 +20,18 @@ void EpsonNumber::setup() {
     case NumberType::VOLUME:
       this->parent_->register_query(EpsonProjector::QueryType::VOLUME);
       break;
+    case NumberType::SHARPNESS:
+      this->parent_->register_query(EpsonProjector::QueryType::SHARPNESS);
+      break;
+    case NumberType::DENSITY:
+      this->parent_->register_query(EpsonProjector::QueryType::DENSITY);
+      break;
+    case NumberType::TINT:
+      this->parent_->register_query(EpsonProjector::QueryType::TINT);
+      break;
+    case NumberType::COLOR_TEMPERATURE:
+      this->parent_->register_query(EpsonProjector::QueryType::COLOR_TEMP);
+      break;
   }
 }
 
@@ -35,6 +47,18 @@ void EpsonNumber::dump_config() {
       break;
     case NumberType::VOLUME:
       type_str = "Volume";
+      break;
+    case NumberType::SHARPNESS:
+      type_str = "Sharpness";
+      break;
+    case NumberType::DENSITY:
+      type_str = "Density";
+      break;
+    case NumberType::TINT:
+      type_str = "Tint";
+      break;
+    case NumberType::COLOR_TEMPERATURE:
+      type_str = "Color Temperature";
       break;
   }
   ESP_LOGCONFIG(TAG, "  Type: %s", type_str);
@@ -52,6 +76,18 @@ void EpsonNumber::control(float value) {
     case NumberType::VOLUME:
       this->parent_->set_volume(int_value);
       break;
+    case NumberType::SHARPNESS:
+      this->parent_->set_sharpness(int_value);
+      break;
+    case NumberType::DENSITY:
+      this->parent_->set_density(int_value);
+      break;
+    case NumberType::TINT:
+      this->parent_->set_tint(int_value);
+      break;
+    case NumberType::COLOR_TEMPERATURE:
+      this->parent_->set_color_temp(int_value);
+      break;
   }
   this->publish_state(value);
 }
@@ -67,6 +103,18 @@ void EpsonNumber::on_state_change() {
       break;
     case NumberType::VOLUME:
       value = static_cast<float>(this->parent_->volume());
+      break;
+    case NumberType::SHARPNESS:
+      value = static_cast<float>(this->parent_->sharpness());
+      break;
+    case NumberType::DENSITY:
+      value = static_cast<float>(this->parent_->density());
+      break;
+    case NumberType::TINT:
+      value = static_cast<float>(this->parent_->tint());
+      break;
+    case NumberType::COLOR_TEMPERATURE:
+      value = static_cast<float>(this->parent_->color_temp());
       break;
   }
   this->publish_state(value);

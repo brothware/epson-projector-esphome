@@ -130,4 +130,52 @@ TEST_F(ResponseParserTest, HandlesInvalidFormat) {
   EXPECT_NE(error, nullptr);
 }
 
+TEST_F(ResponseParserTest, ParsesSharpness) {
+  auto result = parser.parse("SHARP=10\r:");
+  ASSERT_TRUE(result.has_value());
+  auto *sharp = std::get_if<SharpnessResponse>(&*result);
+  ASSERT_NE(sharp, nullptr);
+  EXPECT_EQ(sharp->value, 10);
+}
+
+TEST_F(ResponseParserTest, ParsesDensity) {
+  auto result = parser.parse("DENSITY=5\r:");
+  ASSERT_TRUE(result.has_value());
+  auto *density = std::get_if<DensityResponse>(&*result);
+  ASSERT_NE(density, nullptr);
+  EXPECT_EQ(density->value, 5);
+}
+
+TEST_F(ResponseParserTest, ParsesDensityNegative) {
+  auto result = parser.parse("DENSITY=-15\r:");
+  ASSERT_TRUE(result.has_value());
+  auto *density = std::get_if<DensityResponse>(&*result);
+  ASSERT_NE(density, nullptr);
+  EXPECT_EQ(density->value, -15);
+}
+
+TEST_F(ResponseParserTest, ParsesTint) {
+  auto result = parser.parse("TINT=12\r:");
+  ASSERT_TRUE(result.has_value());
+  auto *tint = std::get_if<TintResponse>(&*result);
+  ASSERT_NE(tint, nullptr);
+  EXPECT_EQ(tint->value, 12);
+}
+
+TEST_F(ResponseParserTest, ParsesTintNegative) {
+  auto result = parser.parse("TINT=-20\r:");
+  ASSERT_TRUE(result.has_value());
+  auto *tint = std::get_if<TintResponse>(&*result);
+  ASSERT_NE(tint, nullptr);
+  EXPECT_EQ(tint->value, -20);
+}
+
+TEST_F(ResponseParserTest, ParsesColorTemperature) {
+  auto result = parser.parse("CTEMP=5\r:");
+  ASSERT_TRUE(result.has_value());
+  auto *ctemp = std::get_if<ColorTempResponse>(&*result);
+  ASSERT_NE(ctemp, nullptr);
+  EXPECT_EQ(ctemp->value, 5);
+}
+
 }  // namespace esphome::epson_projector

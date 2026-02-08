@@ -84,3 +84,11 @@ number:
       name: "Contrast"
     volume:
       name: "Volume"
+    sharpness:
+      name: "Sharpness"
+    density:
+      name: "Density"
+    tint:
+      name: "Tint"
+    color_temperature:
+      name: "Color Temperature"
