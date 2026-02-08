@@ -157,12 +157,20 @@ void EpsonProjector::set_source(const std::string &source_code) {
 }
 
 void EpsonProjector::set_volume(int volume) {
-  this->send_int_command(CMD_VOLUME, VOLUME_MIN, VOLUME_MAX, volume, &EpsonProjector::volume_);
+  int clamped = clamp_value(volume, 0, VOLUME_MAX);
+  int projector_value = (clamped * PROJECTOR_RAW_MAX) / VOLUME_MAX;
+  std::string cmd = build_set_command(CMD_VOLUME, projector_value);
+  this->send_command(cmd, CommandType::SET, [this, clamped](bool success, const std::string &) {
+    if (success) {
+      this->volume_ = clamped;
+      this->notify_state_change();
+    }
+  });
 }
 
 void EpsonProjector::set_brightness(int brightness) {
-  int clamped = clamp_value(brightness, BRIGHTNESS_MIN, BRIGHTNESS_MAX);
-  int projector_value = (clamped * PROJECTOR_BRIGHTNESS_MAX) / BRIGHTNESS_MAX;
+  int clamped = clamp_value(brightness, 0, BRIGHTNESS_MAX);
+  int projector_value = (clamped * PROJECTOR_RAW_MAX) / BRIGHTNESS_MAX;
   std::string cmd = build_set_command(CMD_BRIGHTNESS, projector_value);
   this->send_command(cmd, CommandType::SET, [this, clamped](bool success, const std::string &) {
     if (success) {
@@ -173,8 +181,8 @@ void EpsonProjector::set_brightness(int brightness) {
 }
 
 void EpsonProjector::set_contrast(int contrast) {
-  int clamped = clamp_value(contrast, CONTRAST_MIN, CONTRAST_MAX);
-  int projector_value = (clamped * PROJECTOR_CONTRAST_MAX) / CONTRAST_MAX;
+  int clamped = clamp_value(contrast, 0, CONTRAST_MAX);
+  int projector_value = (clamped * PROJECTOR_RAW_MAX) / CONTRAST_MAX;
   std::string cmd = build_set_command(CMD_CONTRAST, projector_value);
   this->send_command(cmd, CommandType::SET, [this, clamped](bool success, const std::string &) {
     if (success) {
@@ -193,27 +201,75 @@ void EpsonProjector::set_aspect_ratio(const std::string &ratio_code) {
 }
 
 void EpsonProjector::set_sharpness(int value) {
-  this->send_int_command(CMD_SHARPNESS, SHARPNESS_MIN, SHARPNESS_MAX, value, &EpsonProjector::sharpness_);
+  int clamped = clamp_value(value, 0, SHARPNESS_MAX);
+  int projector_value = (clamped * PROJECTOR_RAW_MAX) / SHARPNESS_MAX;
+  std::string cmd = build_set_command(CMD_SHARPNESS, projector_value);
+  this->send_command(cmd, CommandType::SET, [this, clamped](bool success, const std::string &) {
+    if (success) {
+      this->sharpness_ = clamped;
+      this->notify_state_change();
+    }
+  });
 }
 
 void EpsonProjector::set_density(int value) {
-  this->send_int_command(CMD_DENSITY, DENSITY_MIN, DENSITY_MAX, value, &EpsonProjector::density_);
+  int clamped = clamp_value(value, 0, DENSITY_MAX);
+  int projector_value = (clamped * PROJECTOR_RAW_MAX) / DENSITY_MAX;
+  std::string cmd = build_set_command(CMD_DENSITY, projector_value);
+  this->send_command(cmd, CommandType::SET, [this, clamped](bool success, const std::string &) {
+    if (success) {
+      this->density_ = clamped;
+      this->notify_state_change();
+    }
+  });
 }
 
 void EpsonProjector::set_tint(int value) {
-  this->send_int_command(CMD_TINT, TINT_MIN, TINT_MAX, value, &EpsonProjector::tint_);
+  int clamped = clamp_value(value, 0, TINT_MAX);
+  int projector_value = (clamped * PROJECTOR_RAW_MAX) / TINT_MAX;
+  std::string cmd = build_set_command(CMD_TINT, projector_value);
+  this->send_command(cmd, CommandType::SET, [this, clamped](bool success, const std::string &) {
+    if (success) {
+      this->tint_ = clamped;
+      this->notify_state_change();
+    }
+  });
 }
 
 void EpsonProjector::set_color_temp(int value) {
-  this->send_int_command(CMD_COLOR_TEMP, COLOR_TEMP_MIN, COLOR_TEMP_MAX, value, &EpsonProjector::color_temp_);
+  int clamped = clamp_value(value, 0, COLOR_TEMP_MAX);
+  int projector_value = (clamped * PROJECTOR_RAW_MAX) / COLOR_TEMP_MAX;
+  std::string cmd = build_set_command(CMD_COLOR_TEMP, projector_value);
+  this->send_command(cmd, CommandType::SET, [this, clamped](bool success, const std::string &) {
+    if (success) {
+      this->color_temp_ = clamped;
+      this->notify_state_change();
+    }
+  });
 }
 
 void EpsonProjector::set_v_keystone(int value) {
-  this->send_int_command(CMD_VKEYSTONE, VKEYSTONE_MIN, VKEYSTONE_MAX, value, &EpsonProjector::v_keystone_);
+  int clamped = clamp_value(value, 0, KEYSTONE_MAX);
+  int projector_value = (clamped * PROJECTOR_RAW_MAX) / KEYSTONE_MAX;
+  std::string cmd = build_set_command(CMD_VKEYSTONE, projector_value);
+  this->send_command(cmd, CommandType::SET, [this, clamped](bool success, const std::string &) {
+    if (success) {
+      this->v_keystone_ = clamped;
+      this->notify_state_change();
+    }
+  });
 }
 
 void EpsonProjector::set_h_keystone(int value) {
-  this->send_int_command(CMD_HKEYSTONE, HKEYSTONE_MIN, HKEYSTONE_MAX, value, &EpsonProjector::h_keystone_);
+  int clamped = clamp_value(value, 0, KEYSTONE_MAX);
+  int projector_value = (clamped * PROJECTOR_RAW_MAX) / KEYSTONE_MAX;
+  std::string cmd = build_set_command(CMD_HKEYSTONE, projector_value);
+  this->send_command(cmd, CommandType::SET, [this, clamped](bool success, const std::string &) {
+    if (success) {
+      this->h_keystone_ = clamped;
+      this->notify_state_change();
+    }
+  });
 }
 
 void EpsonProjector::set_h_reverse(bool reverse) {
