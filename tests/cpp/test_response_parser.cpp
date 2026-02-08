@@ -117,17 +117,14 @@ TEST_F(ResponseParserTest, ParsesAckResponse) {
 
 TEST_F(ResponseParserTest, ParsesErrorResponseErr) {
   auto result = parser.parse("ERR\r:");
-  ASSERT_TRUE(result.has_value());
-  auto *error = std::get_if<ErrorResult>(&*result);
-  ASSERT_NE(error, nullptr);
-  EXPECT_EQ(error->message, "Command error");
+  ASSERT_FALSE(result.has_value());
+  EXPECT_TRUE(result.error().contains("Command error"));
 }
 
 TEST_F(ResponseParserTest, HandlesInvalidFormat) {
   auto result = parser.parse("INVALID\r:");
-  ASSERT_TRUE(result.has_value());
-  auto *error = std::get_if<ErrorResult>(&*result);
-  EXPECT_NE(error, nullptr);
+  ASSERT_FALSE(result.has_value());
+  EXPECT_TRUE(result.error().contains("Invalid response format"));
 }
 
 TEST_F(ResponseParserTest, ParsesSharpness) {
@@ -292,57 +289,44 @@ TEST_F(ResponseParserTest, ParsesSerialNumber) {
 
 TEST_F(ResponseParserTest, HandlesMalformedPowerValue) {
   auto result = parser.parse("PWR=abc\r:");
-  ASSERT_TRUE(result.has_value());
-  auto *error = std::get_if<ErrorResult>(&*result);
-  ASSERT_NE(error, nullptr);
-  EXPECT_TRUE(error->message.find("Invalid power state") != std::string::npos);
+  ASSERT_FALSE(result.has_value());
+  EXPECT_TRUE(result.error().contains("Invalid power state"));
 }
 
 TEST_F(ResponseParserTest, HandlesMalformedLampHours) {
   auto result = parser.parse("LAMP=xyz\r:");
-  ASSERT_TRUE(result.has_value());
-  auto *error = std::get_if<ErrorResult>(&*result);
-  ASSERT_NE(error, nullptr);
-  EXPECT_TRUE(error->message.find("Invalid lamp hours") != std::string::npos);
+  ASSERT_FALSE(result.has_value());
+  EXPECT_TRUE(result.error().contains("Invalid lamp hours"));
 }
 
 TEST_F(ResponseParserTest, HandlesMalformedVolume) {
   auto result = parser.parse("VOL=not_a_number\r:");
-  ASSERT_TRUE(result.has_value());
-  auto *error = std::get_if<ErrorResult>(&*result);
-  ASSERT_NE(error, nullptr);
-  EXPECT_TRUE(error->message.find("Invalid volume") != std::string::npos);
+  ASSERT_FALSE(result.has_value());
+  EXPECT_TRUE(result.error().contains("Invalid volume"));
 }
 
 TEST_F(ResponseParserTest, HandlesMalformedBrightness) {
   auto result = parser.parse("BRIGHT=invalid\r:");
-  ASSERT_TRUE(result.has_value());
-  auto *error = std::get_if<ErrorResult>(&*result);
-  ASSERT_NE(error, nullptr);
-  EXPECT_TRUE(error->message.find("Invalid brightness") != std::string::npos);
+  ASSERT_FALSE(result.has_value());
+  EXPECT_TRUE(result.error().contains("Invalid brightness"));
 }
 
 TEST_F(ResponseParserTest, HandlesMalformedSharpness) {
   auto result = parser.parse("SHARP=bad\r:");
-  ASSERT_TRUE(result.has_value());
-  auto *error = std::get_if<ErrorResult>(&*result);
-  ASSERT_NE(error, nullptr);
-  EXPECT_TRUE(error->message.find("Invalid sharpness") != std::string::npos);
+  ASSERT_FALSE(result.has_value());
+  EXPECT_TRUE(result.error().contains("Invalid sharpness"));
 }
 
 TEST_F(ResponseParserTest, HandlesMalformedVKeystone) {
   auto result = parser.parse("VKEYSTONE=wrong\r:");
-  ASSERT_TRUE(result.has_value());
-  auto *error = std::get_if<ErrorResult>(&*result);
-  ASSERT_NE(error, nullptr);
-  EXPECT_TRUE(error->message.find("Invalid vertical keystone") != std::string::npos);
+  ASSERT_FALSE(result.has_value());
+  EXPECT_TRUE(result.error().contains("Invalid vertical keystone"));
 }
 
 TEST_F(ResponseParserTest, HandlesEmptyValue) {
   auto result = parser.parse("VOL=\r:");
-  ASSERT_TRUE(result.has_value());
-  auto *error = std::get_if<ErrorResult>(&*result);
-  EXPECT_NE(error, nullptr);
+  ASSERT_FALSE(result.has_value());
+  EXPECT_TRUE(result.error().contains("Invalid volume"));
 }
 
 TEST_F(ResponseParserTest, HandlesLargeLampHours) {
@@ -443,9 +427,8 @@ TEST_F(ResponseParserTest, HandlesWhitespaceInResponse) {
 
 TEST_F(ResponseParserTest, ParsesEmptyResponse) {
   auto result = parser.parse("");
-  ASSERT_TRUE(result.has_value());
-  auto *error = std::get_if<ErrorResult>(&*result);
-  EXPECT_NE(error, nullptr);
+  ASSERT_FALSE(result.has_value());
+  EXPECT_TRUE(result.error().contains("Empty response"));
 }
 
 }  // namespace esphome::epson_projector
