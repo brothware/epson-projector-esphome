@@ -65,10 +65,10 @@ inline constexpr QueryInfo QUERY_TABLE[] = {
 
 inline constexpr size_t QUERY_TABLE_SIZE = sizeof(QUERY_TABLE) / sizeof(QUERY_TABLE[0]);
 
-inline const QueryInfo *find_query_info(QueryType type) {
-  for (size_t i = 0; i < QUERY_TABLE_SIZE; ++i) {
-    if (QUERY_TABLE[i].type == type) {
-      return &QUERY_TABLE[i];
+constexpr const QueryInfo *find_query_info(QueryType type) {
+  for (const auto &info : QUERY_TABLE) {
+    if (info.type == type) {
+      return &info;
     }
   }
   return nullptr;

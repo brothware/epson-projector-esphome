@@ -40,10 +40,10 @@ inline constexpr NumberTypeInfo NUMBER_TYPE_INFO[] = {
 
 inline constexpr std::size_t NUMBER_TYPE_INFO_SIZE = sizeof(NUMBER_TYPE_INFO) / sizeof(NUMBER_TYPE_INFO[0]);
 
-inline const NumberTypeInfo *find_number_type_info(NumberType type) {
-  for (std::size_t i = 0; i < NUMBER_TYPE_INFO_SIZE; ++i) {
-    if (NUMBER_TYPE_INFO[i].type == type) {
-      return &NUMBER_TYPE_INFO[i];
+constexpr const NumberTypeInfo *find_number_type_info(NumberType type) {
+  for (const auto &info : NUMBER_TYPE_INFO) {
+    if (info.type == type) {
+      return &info;
     }
   }
   return nullptr;
@@ -73,10 +73,10 @@ inline constexpr SwitchTypeInfo SWITCH_TYPE_INFO[] = {
 
 inline constexpr std::size_t SWITCH_TYPE_INFO_SIZE = sizeof(SWITCH_TYPE_INFO) / sizeof(SWITCH_TYPE_INFO[0]);
 
-inline const SwitchTypeInfo *find_switch_type_info(SwitchType type) {
-  for (std::size_t i = 0; i < SWITCH_TYPE_INFO_SIZE; ++i) {
-    if (SWITCH_TYPE_INFO[i].type == type) {
-      return &SWITCH_TYPE_INFO[i];
+constexpr const SwitchTypeInfo *find_switch_type_info(SwitchType type) {
+  for (const auto &info : SWITCH_TYPE_INFO) {
+    if (info.type == type) {
+      return &info;
     }
   }
   return nullptr;
@@ -106,10 +106,10 @@ inline constexpr SelectTypeInfo SELECT_TYPE_INFO[] = {
 
 inline constexpr std::size_t SELECT_TYPE_INFO_SIZE = sizeof(SELECT_TYPE_INFO) / sizeof(SELECT_TYPE_INFO[0]);
 
-inline const SelectTypeInfo *find_select_type_info(SelectType type) {
-  for (std::size_t i = 0; i < SELECT_TYPE_INFO_SIZE; ++i) {
-    if (SELECT_TYPE_INFO[i].type == type) {
-      return &SELECT_TYPE_INFO[i];
+constexpr const SelectTypeInfo *find_select_type_info(SelectType type) {
+  for (const auto &info : SELECT_TYPE_INFO) {
+    if (info.type == type) {
+      return &info;
     }
   }
   return nullptr;
@@ -133,10 +133,10 @@ inline constexpr SensorTypeInfo SENSOR_TYPE_INFO[] = {
 
 inline constexpr std::size_t SENSOR_TYPE_INFO_SIZE = sizeof(SENSOR_TYPE_INFO) / sizeof(SENSOR_TYPE_INFO[0]);
 
-inline const SensorTypeInfo *find_sensor_type_info(SensorType type) {
-  for (std::size_t i = 0; i < SENSOR_TYPE_INFO_SIZE; ++i) {
-    if (SENSOR_TYPE_INFO[i].type == type) {
-      return &SENSOR_TYPE_INFO[i];
+constexpr const SensorTypeInfo *find_sensor_type_info(SensorType type) {
+  for (const auto &info : SENSOR_TYPE_INFO) {
+    if (info.type == type) {
+      return &info;
     }
   }
   return nullptr;
@@ -161,10 +161,10 @@ inline constexpr BinarySensorTypeInfo BINARY_SENSOR_TYPE_INFO[] = {
 inline constexpr std::size_t BINARY_SENSOR_TYPE_INFO_SIZE =
     sizeof(BINARY_SENSOR_TYPE_INFO) / sizeof(BINARY_SENSOR_TYPE_INFO[0]);
 
-inline const BinarySensorTypeInfo *find_binary_sensor_type_info(BinarySensorType type) {
-  for (std::size_t i = 0; i < BINARY_SENSOR_TYPE_INFO_SIZE; ++i) {
-    if (BINARY_SENSOR_TYPE_INFO[i].type == type) {
-      return &BINARY_SENSOR_TYPE_INFO[i];
+constexpr const BinarySensorTypeInfo *find_binary_sensor_type_info(BinarySensorType type) {
+  for (const auto &info : BINARY_SENSOR_TYPE_INFO) {
+    if (info.type == type) {
+      return &info;
     }
   }
   return nullptr;
@@ -187,10 +187,10 @@ inline constexpr TextSensorTypeInfo TEXT_SENSOR_TYPE_INFO[] = {
 inline constexpr std::size_t TEXT_SENSOR_TYPE_INFO_SIZE =
     sizeof(TEXT_SENSOR_TYPE_INFO) / sizeof(TEXT_SENSOR_TYPE_INFO[0]);
 
-inline const TextSensorTypeInfo *find_text_sensor_type_info(TextSensorType type) {
-  for (std::size_t i = 0; i < TEXT_SENSOR_TYPE_INFO_SIZE; ++i) {
-    if (TEXT_SENSOR_TYPE_INFO[i].type == type) {
-      return &TEXT_SENSOR_TYPE_INFO[i];
+constexpr const TextSensorTypeInfo *find_text_sensor_type_info(TextSensorType type) {
+  for (const auto &info : TEXT_SENSOR_TYPE_INFO) {
+    if (info.type == type) {
+      return &info;
     }
   }
   return nullptr;
