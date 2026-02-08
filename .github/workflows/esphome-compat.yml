@@ -1,0 +1,99 @@
+name: ESPHome Compatibility
+
+on:
+  schedule:
+    # Run daily at 6:00 UTC
+    - cron: "0 6 * * *"
+  workflow_dispatch: # Allow manual trigger
+
+jobs:
+  check-esphome-version:
+    runs-on: ubuntu-latest
+    outputs:
+      latest_version: ${{ steps.get-version.outputs.version }}
+      version_changed: ${{ steps.check-cache.outputs.changed }}
+    steps:
+      - name: Get latest ESPHome version
+        id: get-version
+        run: |
+          VERSION=$(pip index versions esphome 2>/dev/null | grep -oP 'esphome \(\K[^)]+' | head -1)
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Latest ESPHome version: $VERSION"
+
+      - name: Check if version changed
+        id: check-cache
+        uses: actions/cache@v4
+        with:
+          path: .esphome-version
+          key: esphome-version-${{ steps.get-version.outputs.version }}
+
+      - name: Mark as changed if cache miss
+        if: steps.check-cache.outputs.cache-hit != 'true'
+        run: |
+          echo "${{ steps.get-version.outputs.version }}" > .esphome-version
+          echo "changed=true" >> $GITHUB_OUTPUT
+
+  test-compatibility:
+    needs: check-esphome-version
+    if: needs.check-esphome-version.outputs.version_changed == 'true' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        esphome-version:
+          - latest
+          - beta
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Cache PlatformIO
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.platformio
+            tests/esphome/.esphome
+          key: pio-compat-${{ matrix.esphome-version }}-${{ hashFiles('tests/esphome/test_config.yaml') }}
+          restore-keys: |
+            pio-compat-${{ matrix.esphome-version }}-
+
+      - name: Build with ESPHome ${{ matrix.esphome-version }}
+        uses: esphome/build-action@v6
+        with:
+          yaml-file: tests/esphome/test_config.yaml
+          version: ${{ matrix.esphome-version }}
+
+  notify-on-failure:
+    needs: test-compatibility
+    if: failure()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create issue on failure
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const title = `ESPHome compatibility check failed`;
+            const runUrl = `${context.serverUrl}/${context.repo.owner}/` +
+              `${context.repo.repo}/actions/runs/${context.runId}`;
+            const body = `The scheduled ESPHome compatibility check has failed.
+
+            **Workflow run:** ${runUrl}
+
+            Please check for breaking changes in the latest ESPHome release.`;
+
+            // Check if issue already exists
+            const issues = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              labels: 'esphome-compat'
+            });
+
+            if (issues.data.length === 0) {
+              await github.rest.issues.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title: title,
+                body: body,
+                labels: ['esphome-compat', 'bug']
+              });
+            }
