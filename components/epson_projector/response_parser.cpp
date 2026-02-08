@@ -47,6 +47,106 @@ bool is_bool_true(const std::string &value) {
   return value == ARG_ON || value == ARG_ON_NUMERIC;
 }
 
+ParseResult make_volume(int v) {
+  return VolumeResponse{v};
+}
+ParseResult make_brightness(int v) {
+  return BrightnessResponse{v};
+}
+ParseResult make_contrast(int v) {
+  return ContrastResponse{v};
+}
+ParseResult make_sharpness(int v) {
+  return SharpnessResponse{v};
+}
+ParseResult make_density(int v) {
+  return DensityResponse{v};
+}
+ParseResult make_tint(int v) {
+  return TintResponse{v};
+}
+ParseResult make_color_temp(int v) {
+  return ColorTempResponse{v};
+}
+ParseResult make_v_keystone(int v) {
+  return VKeystoneResponse{v};
+}
+ParseResult make_h_keystone(int v) {
+  return HKeystoneResponse{v};
+}
+
+ParseResult make_mute(bool v) {
+  return MuteResponse{v};
+}
+ParseResult make_h_reverse(bool v) {
+  return HReverseResponse{v};
+}
+ParseResult make_v_reverse(bool v) {
+  return VReverseResponse{v};
+}
+ParseResult make_freeze(bool v) {
+  return FreezeResponse{v};
+}
+
+ParseResult make_source(const std::string &v) {
+  return SourceResponse{v};
+}
+ParseResult make_color_mode(const std::string &v) {
+  return ColorModeResponse{v};
+}
+ParseResult make_aspect_ratio(const std::string &v) {
+  return AspectRatioResponse{v};
+}
+ParseResult make_luminance(const std::string &v) {
+  return LuminanceResponse{v};
+}
+ParseResult make_gamma(const std::string &v) {
+  return GammaResponse{v};
+}
+ParseResult make_serial(const std::string &v) {
+  return SerialNumberResponse{v};
+}
+
+struct ScaledIntEntry {
+  const char *cmd;
+  int ui_max;
+  ParseResult (*make)(int);
+};
+
+struct BoolEntry {
+  const char *cmd;
+  ParseResult (*make)(bool);
+};
+
+struct StringEntry {
+  const char *cmd;
+  ParseResult (*make)(const std::string &);
+};
+
+constexpr ScaledIntEntry SCALED_INT_PARSERS[] = {
+    {CMD_VOLUME, VOLUME_MAX, make_volume},
+    {CMD_BRIGHTNESS, BRIGHTNESS_MAX, make_brightness},
+    {CMD_CONTRAST, CONTRAST_MAX, make_contrast},
+    {CMD_SHARPNESS, SHARPNESS_MAX, make_sharpness},
+    {CMD_DENSITY, DENSITY_MAX, make_density},
+    {CMD_TINT, TINT_MAX, make_tint},
+    {CMD_COLOR_TEMP, COLOR_TEMP_MAX, make_color_temp},
+    {CMD_VKEYSTONE, KEYSTONE_MAX, make_v_keystone},
+    {CMD_HKEYSTONE, KEYSTONE_MAX, make_h_keystone},
+};
+
+constexpr BoolEntry BOOL_PARSERS[] = {
+    {CMD_MUTE, make_mute},
+    {CMD_HREVERSE, make_h_reverse},
+    {CMD_VREVERSE, make_v_reverse},
+    {CMD_FREEZE, make_freeze},
+};
+
+constexpr StringEntry STRING_PARSERS[] = {
+    {CMD_SOURCE, make_source},       {CMD_COLOR_MODE, make_color_mode}, {CMD_ASPECT, make_aspect_ratio},
+    {CMD_LUMINANCE, make_luminance}, {CMD_GAMMA, make_gamma},           {CMD_SERIAL, make_serial},
+};
+
 }  // namespace
 
 bool ResponseParser::is_complete_response(const std::string &buffer) const {
@@ -127,118 +227,27 @@ compat::expected<ParseResult, std::string> ResponseParser::parse_key_value(const
     return ErrorResponse{static_cast<uint8_t>(*code)};
   }
 
-  if (key == CMD_SOURCE) {
-    return SourceResponse{value};
-  }
-
-  if (key == CMD_MUTE) {
-    return MuteResponse{is_bool_true(value)};
-  }
-
-  if (key == CMD_VOLUME) {
-    auto vol = safe_stoi(value);
-    if (!vol) {
-      return compat::unexpected("Invalid volume value: " + value);
+  for (const auto &entry : SCALED_INT_PARSERS) {
+    if (key == entry.cmd) {
+      auto raw_value = safe_stoi(value);
+      if (!raw_value) {
+        return compat::unexpected("Invalid " + std::string(entry.cmd) + " value: " + value);
+      }
+      int scaled = (*raw_value * entry.ui_max) / PROJECTOR_RAW_MAX;
+      return entry.make(scaled);
     }
-    return VolumeResponse{*vol};
   }
 
-  if (key == CMD_BRIGHTNESS) {
-    auto raw_value = safe_stoi(value);
-    if (!raw_value) {
-      return compat::unexpected("Invalid brightness value: " + value);
+  for (const auto &entry : BOOL_PARSERS) {
+    if (key == entry.cmd) {
+      return entry.make(is_bool_true(value));
     }
-    int scaled = (*raw_value * BRIGHTNESS_MAX) / PROJECTOR_BRIGHTNESS_MAX;
-    return BrightnessResponse{scaled};
   }
 
-  if (key == CMD_CONTRAST) {
-    auto raw_value = safe_stoi(value);
-    if (!raw_value) {
-      return compat::unexpected("Invalid contrast value: " + value);
+  for (const auto &entry : STRING_PARSERS) {
+    if (key == entry.cmd) {
+      return entry.make(value);
     }
-    int scaled = (*raw_value * CONTRAST_MAX) / PROJECTOR_CONTRAST_MAX;
-    return ContrastResponse{scaled};
-  }
-
-  if (key == CMD_COLOR_MODE) {
-    return ColorModeResponse{value};
-  }
-
-  if (key == CMD_ASPECT) {
-    return AspectRatioResponse{value};
-  }
-
-  if (key == CMD_SHARPNESS) {
-    auto val = safe_stoi(value);
-    if (!val) {
-      return compat::unexpected("Invalid sharpness value: " + value);
-    }
-    return SharpnessResponse{*val};
-  }
-
-  if (key == CMD_DENSITY) {
-    auto val = safe_stoi(value);
-    if (!val) {
-      return compat::unexpected("Invalid density value: " + value);
-    }
-    return DensityResponse{*val};
-  }
-
-  if (key == CMD_TINT) {
-    auto val = safe_stoi(value);
-    if (!val) {
-      return compat::unexpected("Invalid tint value: " + value);
-    }
-    return TintResponse{*val};
-  }
-
-  if (key == CMD_COLOR_TEMP) {
-    auto val = safe_stoi(value);
-    if (!val) {
-      return compat::unexpected("Invalid color temperature value: " + value);
-    }
-    return ColorTempResponse{*val};
-  }
-
-  if (key == CMD_VKEYSTONE) {
-    auto val = safe_stoi(value);
-    if (!val) {
-      return compat::unexpected("Invalid vertical keystone value: " + value);
-    }
-    return VKeystoneResponse{*val};
-  }
-
-  if (key == CMD_HKEYSTONE) {
-    auto val = safe_stoi(value);
-    if (!val) {
-      return compat::unexpected("Invalid horizontal keystone value: " + value);
-    }
-    return HKeystoneResponse{*val};
-  }
-
-  if (key == CMD_HREVERSE) {
-    return HReverseResponse{is_bool_true(value)};
-  }
-
-  if (key == CMD_VREVERSE) {
-    return VReverseResponse{is_bool_true(value)};
-  }
-
-  if (key == CMD_LUMINANCE) {
-    return LuminanceResponse{value};
-  }
-
-  if (key == CMD_GAMMA) {
-    return GammaResponse{value};
-  }
-
-  if (key == CMD_FREEZE) {
-    return FreezeResponse{is_bool_true(value)};
-  }
-
-  if (key == CMD_SERIAL) {
-    return SerialNumberResponse{value};
   }
 
   return StringResponse{value};
