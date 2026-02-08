@@ -35,6 +35,10 @@ class EpsonProjector : public uart::UARTDevice, public PollingComponent {
   void set_density(int value);
   void set_tint(int value);
   void set_color_temp(int value);
+  void set_v_keystone(int value);
+  void set_h_keystone(int value);
+  void set_h_reverse(bool reverse);
+  void set_v_reverse(bool reverse);
 
   void query_power();
   void query_lamp_hours();
@@ -50,6 +54,10 @@ class EpsonProjector : public uart::UARTDevice, public PollingComponent {
   void query_density();
   void query_tint();
   void query_color_temp();
+  void query_v_keystone();
+  void query_h_keystone();
+  void query_h_reverse();
+  void query_v_reverse();
 
   [[nodiscard]] PowerState power_state() const { return power_state_; }
   [[nodiscard]] bool is_muted() const { return muted_; }
@@ -65,6 +73,10 @@ class EpsonProjector : public uart::UARTDevice, public PollingComponent {
   [[nodiscard]] int density() const { return density_; }
   [[nodiscard]] int tint() const { return tint_; }
   [[nodiscard]] int color_temp() const { return color_temp_; }
+  [[nodiscard]] int v_keystone() const { return v_keystone_; }
+  [[nodiscard]] int h_keystone() const { return h_keystone_; }
+  [[nodiscard]] bool h_reverse() const { return h_reverse_; }
+  [[nodiscard]] bool v_reverse() const { return v_reverse_; }
 
   using StateCallback = std::function<void()>;
   void add_on_state_callback(StateCallback callback) { state_callbacks_.push_back(std::move(callback)); }
@@ -84,6 +96,10 @@ class EpsonProjector : public uart::UARTDevice, public PollingComponent {
     DENSITY,
     TINT,
     COLOR_TEMP,
+    V_KEYSTONE,
+    H_KEYSTONE,
+    H_REVERSE,
+    V_REVERSE,
   };
   void register_query(QueryType type) { registered_queries_ |= (1 << static_cast<uint16_t>(type)); }
   bool has_query(QueryType type) const { return (registered_queries_ & (1 << static_cast<uint16_t>(type))) != 0; }
@@ -115,6 +131,10 @@ class EpsonProjector : public uart::UARTDevice, public PollingComponent {
   int density_{0};
   int tint_{0};
   int color_temp_{0};
+  int v_keystone_{0};
+  int h_keystone_{0};
+  bool h_reverse_{false};
+  bool v_reverse_{false};
 
   uint32_t last_command_time_{0};
   static constexpr uint32_t COMMAND_DELAY_MS = 500;

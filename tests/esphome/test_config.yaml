@@ -50,6 +50,10 @@ switch:
       name: "Projector Power"
     mute:
       name: "Projector Mute"
+    h_reverse:
+      name: "Horizontal Reverse"
+    v_reverse:
+      name: "Vertical Reverse"
 
 binary_sensor:
   - platform: epson_projector
@@ -92,3 +96,7 @@ number:
       name: "Tint"
     color_temperature:
       name: "Color Temperature"
+    v_keystone:
+      name: "Vertical Keystone"
+    h_keystone:
+      name: "Horizontal Keystone"

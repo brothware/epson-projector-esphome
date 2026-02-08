@@ -119,8 +119,20 @@ std::optional<ParseResult> ResponseParser::parse_key_value(const std::string &ke
     return ColorTempResponse{std::stoi(value)};
   }
 
-  if (key == CMD_VKEYSTONE || key == CMD_HKEYSTONE) {
-    return NumericResponse{std::stoi(value)};
+  if (key == CMD_VKEYSTONE) {
+    return VKeystoneResponse{std::stoi(value)};
+  }
+
+  if (key == CMD_HKEYSTONE) {
+    return HKeystoneResponse{std::stoi(value)};
+  }
+
+  if (key == CMD_HREVERSE) {
+    return HReverseResponse{value == ARG_ON || value == "01"};
+  }
+
+  if (key == CMD_VREVERSE) {
+    return VReverseResponse{value == ARG_ON || value == "01"};
   }
 
   return StringResponse{value};

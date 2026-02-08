@@ -17,6 +17,12 @@ void EpsonSwitch::setup() {
     case SwitchType::MUTE:
       this->parent_->register_query(EpsonProjector::QueryType::MUTE);
       break;
+    case SwitchType::H_REVERSE:
+      this->parent_->register_query(EpsonProjector::QueryType::H_REVERSE);
+      break;
+    case SwitchType::V_REVERSE:
+      this->parent_->register_query(EpsonProjector::QueryType::V_REVERSE);
+      break;
   }
 }
 
@@ -30,6 +36,12 @@ void EpsonSwitch::dump_config() {
     case SwitchType::MUTE:
       type_str = "Mute";
       break;
+    case SwitchType::H_REVERSE:
+      type_str = "H Reverse";
+      break;
+    case SwitchType::V_REVERSE:
+      type_str = "V Reverse";
+      break;
   }
   ESP_LOGCONFIG(TAG, "  Type: %s", type_str);
 }
@@ -42,6 +54,12 @@ void EpsonSwitch::write_state(bool state) {
     case SwitchType::MUTE:
       this->parent_->set_mute(state);
       break;
+    case SwitchType::H_REVERSE:
+      this->parent_->set_h_reverse(state);
+      break;
+    case SwitchType::V_REVERSE:
+      this->parent_->set_v_reverse(state);
+      break;
   }
 }
 
@@ -53,6 +71,12 @@ void EpsonSwitch::on_state_change() {
       break;
     case SwitchType::MUTE:
       state = this->parent_->is_muted();
+      break;
+    case SwitchType::H_REVERSE:
+      state = this->parent_->h_reverse();
+      break;
+    case SwitchType::V_REVERSE:
+      state = this->parent_->v_reverse();
       break;
   }
   this->publish_state(state);

@@ -57,6 +57,10 @@ static constexpr int TINT_MIN = -32;
 static constexpr int TINT_MAX = 32;
 static constexpr int COLOR_TEMP_MIN = 0;
 static constexpr int COLOR_TEMP_MAX = 9;
+static constexpr int VKEYSTONE_MIN = -30;
+static constexpr int VKEYSTONE_MAX = 30;
+static constexpr int HKEYSTONE_MIN = -30;
+static constexpr int HKEYSTONE_MAX = 30;
 
 enum class PowerState : uint8_t {
   STANDBY = 0,

@@ -32,6 +32,12 @@ void EpsonNumber::setup() {
     case NumberType::COLOR_TEMPERATURE:
       this->parent_->register_query(EpsonProjector::QueryType::COLOR_TEMP);
       break;
+    case NumberType::V_KEYSTONE:
+      this->parent_->register_query(EpsonProjector::QueryType::V_KEYSTONE);
+      break;
+    case NumberType::H_KEYSTONE:
+      this->parent_->register_query(EpsonProjector::QueryType::H_KEYSTONE);
+      break;
   }
 }
 
@@ -59,6 +65,12 @@ void EpsonNumber::dump_config() {
       break;
     case NumberType::COLOR_TEMPERATURE:
       type_str = "Color Temperature";
+      break;
+    case NumberType::V_KEYSTONE:
+      type_str = "V Keystone";
+      break;
+    case NumberType::H_KEYSTONE:
+      type_str = "H Keystone";
       break;
   }
   ESP_LOGCONFIG(TAG, "  Type: %s", type_str);
@@ -88,6 +100,12 @@ void EpsonNumber::control(float value) {
     case NumberType::COLOR_TEMPERATURE:
       this->parent_->set_color_temp(int_value);
       break;
+    case NumberType::V_KEYSTONE:
+      this->parent_->set_v_keystone(int_value);
+      break;
+    case NumberType::H_KEYSTONE:
+      this->parent_->set_h_keystone(int_value);
+      break;
   }
   this->publish_state(value);
 }
@@ -115,6 +133,12 @@ void EpsonNumber::on_state_change() {
       break;
     case NumberType::COLOR_TEMPERATURE:
       value = static_cast<float>(this->parent_->color_temp());
+      break;
+    case NumberType::V_KEYSTONE:
+      value = static_cast<float>(this->parent_->v_keystone());
+      break;
+    case NumberType::H_KEYSTONE:
+      value = static_cast<float>(this->parent_->h_keystone());
       break;
   }
   this->publish_state(value);

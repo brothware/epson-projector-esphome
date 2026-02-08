@@ -16,6 +16,8 @@ enum class NumberType : uint8_t {
   DENSITY,
   TINT,
   COLOR_TEMPERATURE,
+  V_KEYSTONE,
+  H_KEYSTONE,
 };
 
 class EpsonNumber : public number::Number, public Component, public Parented<EpsonProjector> {

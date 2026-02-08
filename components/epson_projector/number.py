@@ -13,24 +13,32 @@ from .const import (
     CONF_COLOR_TEMPERATURE,
     CONF_CONTRAST,
     CONF_DENSITY,
+    CONF_H_KEYSTONE,
     CONF_SHARPNESS,
     CONF_TINT,
+    CONF_V_KEYSTONE,
     CONF_VOLUME,
     CONTRAST_MAX,
     CONTRAST_MIN,
     DENSITY_MAX,
     DENSITY_MIN,
+    HKEYSTONE_MAX,
+    HKEYSTONE_MIN,
     ICON_BRIGHTNESS,
     ICON_COLOR_TEMPERATURE,
     ICON_CONTRAST,
     ICON_DENSITY,
+    ICON_H_KEYSTONE,
     ICON_SHARPNESS,
     ICON_TINT,
+    ICON_V_KEYSTONE,
     ICON_VOLUME,
     SHARPNESS_MAX,
     SHARPNESS_MIN,
     TINT_MAX,
     TINT_MIN,
+    VKEYSTONE_MAX,
+    VKEYSTONE_MIN,
     VOLUME_MAX,
     VOLUME_MIN,
 )
@@ -62,6 +70,8 @@ NUMBER_TYPES = {
     CONF_DENSITY: NumberType.DENSITY,
     CONF_TINT: NumberType.TINT,
     CONF_COLOR_TEMPERATURE: NumberType.COLOR_TEMPERATURE,
+    CONF_V_KEYSTONE: NumberType.V_KEYSTONE,
+    CONF_H_KEYSTONE: NumberType.H_KEYSTONE,
 }
 
 NUMBER_RANGES = {
@@ -72,6 +82,8 @@ NUMBER_RANGES = {
     CONF_DENSITY: {"min": DENSITY_MIN, "max": DENSITY_MAX},
     CONF_TINT: {"min": TINT_MIN, "max": TINT_MAX},
     CONF_COLOR_TEMPERATURE: {"min": COLOR_TEMPERATURE_MIN, "max": COLOR_TEMPERATURE_MAX},
+    CONF_V_KEYSTONE: {"min": VKEYSTONE_MIN, "max": VKEYSTONE_MAX},
+    CONF_H_KEYSTONE: {"min": HKEYSTONE_MIN, "max": HKEYSTONE_MAX},
 }
 
 CONFIG_SCHEMA = projector_platform_schema(
@@ -83,6 +95,8 @@ CONFIG_SCHEMA = projector_platform_schema(
         cv.Optional(CONF_DENSITY): _number_schema_with_slider(EpsonNumber, ICON_DENSITY),
         cv.Optional(CONF_TINT): _number_schema_with_slider(EpsonNumber, ICON_TINT),
         cv.Optional(CONF_COLOR_TEMPERATURE): _number_schema_with_slider(EpsonNumber, ICON_COLOR_TEMPERATURE),
+        cv.Optional(CONF_V_KEYSTONE): _number_schema_with_slider(EpsonNumber, ICON_V_KEYSTONE),
+        cv.Optional(CONF_H_KEYSTONE): _number_schema_with_slider(EpsonNumber, ICON_H_KEYSTONE),
     }
 )
 

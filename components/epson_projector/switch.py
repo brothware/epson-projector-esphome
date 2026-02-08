@@ -4,7 +4,16 @@ from esphome.components import switch
 from esphome.const import DEVICE_CLASS_SWITCH, ENTITY_CATEGORY_CONFIG
 
 from . import epson_projector_ns
-from .const import CONF_MUTE, CONF_POWER, ICON_MUTE, ICON_PROJECTOR
+from .const import (
+    CONF_H_REVERSE,
+    CONF_MUTE,
+    CONF_POWER,
+    CONF_V_REVERSE,
+    ICON_H_REVERSE,
+    ICON_MUTE,
+    ICON_PROJECTOR,
+    ICON_V_REVERSE,
+)
 from .platform_helpers import get_projector_parent, projector_platform_schema
 
 DEPENDENCIES = ["epson_projector"]
@@ -15,6 +24,8 @@ SwitchType = epson_projector_ns.enum("SwitchType", is_class=True)
 SWITCH_TYPES = {
     CONF_POWER: SwitchType.POWER,
     CONF_MUTE: SwitchType.MUTE,
+    CONF_H_REVERSE: SwitchType.H_REVERSE,
+    CONF_V_REVERSE: SwitchType.V_REVERSE,
 }
 
 CONFIG_SCHEMA = projector_platform_schema(
@@ -27,6 +38,16 @@ CONFIG_SCHEMA = projector_platform_schema(
         cv.Optional(CONF_MUTE): switch.switch_schema(
             EpsonSwitch,
             icon=ICON_MUTE,
+            entity_category=ENTITY_CATEGORY_CONFIG,
+        ),
+        cv.Optional(CONF_H_REVERSE): switch.switch_schema(
+            EpsonSwitch,
+            icon=ICON_H_REVERSE,
+            entity_category=ENTITY_CATEGORY_CONFIG,
+        ),
+        cv.Optional(CONF_V_REVERSE): switch.switch_schema(
+            EpsonSwitch,
+            icon=ICON_V_REVERSE,
             entity_category=ENTITY_CATEGORY_CONFIG,
         ),
     }

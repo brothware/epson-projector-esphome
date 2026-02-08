@@ -111,6 +111,18 @@ void EpsonProjector::update() {
     if (this->has_query(QueryType::COLOR_TEMP)) {
       this->query_color_temp();
     }
+    if (this->has_query(QueryType::V_KEYSTONE)) {
+      this->query_v_keystone();
+    }
+    if (this->has_query(QueryType::H_KEYSTONE)) {
+      this->query_h_keystone();
+    }
+    if (this->has_query(QueryType::H_REVERSE)) {
+      this->query_h_reverse();
+    }
+    if (this->has_query(QueryType::V_REVERSE)) {
+      this->query_v_reverse();
+    }
   }
 }
 
@@ -256,6 +268,48 @@ void EpsonProjector::set_color_temp(int value) {
   });
 }
 
+void EpsonProjector::set_v_keystone(int value) {
+  int clamped = clamp_value(value, VKEYSTONE_MIN, VKEYSTONE_MAX);
+  std::string cmd = build_set_command(CMD_VKEYSTONE, clamped);
+  this->send_command(cmd, CommandType::SET, [this, clamped](bool success, const std::string &) {
+    if (success) {
+      this->v_keystone_ = clamped;
+      this->notify_state_change();
+    }
+  });
+}
+
+void EpsonProjector::set_h_keystone(int value) {
+  int clamped = clamp_value(value, HKEYSTONE_MIN, HKEYSTONE_MAX);
+  std::string cmd = build_set_command(CMD_HKEYSTONE, clamped);
+  this->send_command(cmd, CommandType::SET, [this, clamped](bool success, const std::string &) {
+    if (success) {
+      this->h_keystone_ = clamped;
+      this->notify_state_change();
+    }
+  });
+}
+
+void EpsonProjector::set_h_reverse(bool reverse) {
+  std::string cmd = build_set_command(CMD_HREVERSE, reverse ? ARG_ON : ARG_OFF);
+  this->send_command(cmd, CommandType::SET, [this, reverse](bool success, const std::string &) {
+    if (success) {
+      this->h_reverse_ = reverse;
+      this->notify_state_change();
+    }
+  });
+}
+
+void EpsonProjector::set_v_reverse(bool reverse) {
+  std::string cmd = build_set_command(CMD_VREVERSE, reverse ? ARG_ON : ARG_OFF);
+  this->send_command(cmd, CommandType::SET, [this, reverse](bool success, const std::string &) {
+    if (success) {
+      this->v_reverse_ = reverse;
+      this->notify_state_change();
+    }
+  });
+}
+
 void EpsonProjector::query_power() {
   std::string cmd = build_query_command(CMD_POWER);
   this->send_command(cmd, CommandType::QUERY);
@@ -323,6 +377,26 @@ void EpsonProjector::query_tint() {
 
 void EpsonProjector::query_color_temp() {
   std::string cmd = build_query_command(CMD_COLOR_TEMP);
+  this->send_command(cmd, CommandType::QUERY);
+}
+
+void EpsonProjector::query_v_keystone() {
+  std::string cmd = build_query_command(CMD_VKEYSTONE);
+  this->send_command(cmd, CommandType::QUERY);
+}
+
+void EpsonProjector::query_h_keystone() {
+  std::string cmd = build_query_command(CMD_HKEYSTONE);
+  this->send_command(cmd, CommandType::QUERY);
+}
+
+void EpsonProjector::query_h_reverse() {
+  std::string cmd = build_query_command(CMD_HREVERSE);
+  this->send_command(cmd, CommandType::QUERY);
+}
+
+void EpsonProjector::query_v_reverse() {
+  std::string cmd = build_query_command(CMD_VREVERSE);
   this->send_command(cmd, CommandType::QUERY);
 }
 
@@ -413,6 +487,22 @@ void EpsonProjector::handle_response(const std::string &response) {
         } else if constexpr (std::is_same_v<T, ColorTempResponse>) {
           ESP_LOGD(TAG, "Color temperature: %d", arg.value);
           this->color_temp_ = arg.value;
+          this->notify_state_change();
+        } else if constexpr (std::is_same_v<T, VKeystoneResponse>) {
+          ESP_LOGD(TAG, "V Keystone: %d", arg.value);
+          this->v_keystone_ = arg.value;
+          this->notify_state_change();
+        } else if constexpr (std::is_same_v<T, HKeystoneResponse>) {
+          ESP_LOGD(TAG, "H Keystone: %d", arg.value);
+          this->h_keystone_ = arg.value;
+          this->notify_state_change();
+        } else if constexpr (std::is_same_v<T, HReverseResponse>) {
+          ESP_LOGD(TAG, "H Reverse: %s", arg.reversed ? "ON" : "OFF");
+          this->h_reverse_ = arg.reversed;
+          this->notify_state_change();
+        } else if constexpr (std::is_same_v<T, VReverseResponse>) {
+          ESP_LOGD(TAG, "V Reverse: %s", arg.reversed ? "ON" : "OFF");
+          this->v_reverse_ = arg.reversed;
           this->notify_state_change();
         } else if constexpr (std::is_same_v<T, NumericResponse>) {
           ESP_LOGD(TAG, "Numeric response: %d", arg.value);

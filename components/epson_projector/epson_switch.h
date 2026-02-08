@@ -11,6 +11,8 @@ namespace esphome::epson_projector {
 enum class SwitchType : uint8_t {
   POWER,
   MUTE,
+  H_REVERSE,
+  V_REVERSE,
 };
 
 class EpsonSwitch : public switch_::Switch, public Component, public Parented<EpsonProjector> {

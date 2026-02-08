@@ -65,6 +65,22 @@ struct ColorTempResponse {
   int value;
 };
 
+struct VKeystoneResponse {
+  int value;
+};
+
+struct HKeystoneResponse {
+  int value;
+};
+
+struct HReverseResponse {
+  bool reversed;
+};
+
+struct VReverseResponse {
+  bool reversed;
+};
+
 struct NumericResponse {
   int value;
 };
@@ -79,10 +95,11 @@ struct ErrorResult {
   std::string message;
 };
 
-using ParseResult = std::variant<PowerResponse, LampResponse, ErrorResponse, SourceResponse, MuteResponse,
-                                 VolumeResponse, BrightnessResponse, ContrastResponse, ColorModeResponse,
-                                 AspectRatioResponse, SharpnessResponse, DensityResponse, TintResponse,
-                                 ColorTempResponse, NumericResponse, StringResponse, AckResponse, ErrorResult>;
+using ParseResult =
+    std::variant<PowerResponse, LampResponse, ErrorResponse, SourceResponse, MuteResponse, VolumeResponse,
+                 BrightnessResponse, ContrastResponse, ColorModeResponse, AspectRatioResponse, SharpnessResponse,
+                 DensityResponse, TintResponse, ColorTempResponse, VKeystoneResponse, HKeystoneResponse,
+                 HReverseResponse, VReverseResponse, NumericResponse, StringResponse, AckResponse, ErrorResult>;
 
 class ResponseParser {
  public:

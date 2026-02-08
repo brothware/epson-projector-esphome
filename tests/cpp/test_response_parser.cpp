@@ -178,4 +178,60 @@ TEST_F(ResponseParserTest, ParsesColorTemperature) {
   EXPECT_EQ(ctemp->value, 5);
 }
 
+TEST_F(ResponseParserTest, ParsesVKeystone) {
+  auto result = parser.parse("VKEYSTONE=15\r:");
+  ASSERT_TRUE(result.has_value());
+  auto *vk = std::get_if<VKeystoneResponse>(&*result);
+  ASSERT_NE(vk, nullptr);
+  EXPECT_EQ(vk->value, 15);
+}
+
+TEST_F(ResponseParserTest, ParsesVKeystoneNegative) {
+  auto result = parser.parse("VKEYSTONE=-20\r:");
+  ASSERT_TRUE(result.has_value());
+  auto *vk = std::get_if<VKeystoneResponse>(&*result);
+  ASSERT_NE(vk, nullptr);
+  EXPECT_EQ(vk->value, -20);
+}
+
+TEST_F(ResponseParserTest, ParsesHKeystone) {
+  auto result = parser.parse("HKEYSTONE=10\r:");
+  ASSERT_TRUE(result.has_value());
+  auto *hk = std::get_if<HKeystoneResponse>(&*result);
+  ASSERT_NE(hk, nullptr);
+  EXPECT_EQ(hk->value, 10);
+}
+
+TEST_F(ResponseParserTest, ParsesHReverseOn) {
+  auto result = parser.parse("HREVERSE=ON\r:");
+  ASSERT_TRUE(result.has_value());
+  auto *hr = std::get_if<HReverseResponse>(&*result);
+  ASSERT_NE(hr, nullptr);
+  EXPECT_TRUE(hr->reversed);
+}
+
+TEST_F(ResponseParserTest, ParsesHReverseOff) {
+  auto result = parser.parse("HREVERSE=OFF\r:");
+  ASSERT_TRUE(result.has_value());
+  auto *hr = std::get_if<HReverseResponse>(&*result);
+  ASSERT_NE(hr, nullptr);
+  EXPECT_FALSE(hr->reversed);
+}
+
+TEST_F(ResponseParserTest, ParsesVReverseOn) {
+  auto result = parser.parse("VREVERSE=ON\r:");
+  ASSERT_TRUE(result.has_value());
+  auto *vr = std::get_if<VReverseResponse>(&*result);
+  ASSERT_NE(vr, nullptr);
+  EXPECT_TRUE(vr->reversed);
+}
+
+TEST_F(ResponseParserTest, ParsesVReverseOff) {
+  auto result = parser.parse("VREVERSE=OFF\r:");
+  ASSERT_TRUE(result.has_value());
+  auto *vr = std::get_if<VReverseResponse>(&*result);
+  ASSERT_NE(vr, nullptr);
+  EXPECT_FALSE(vr->reversed);
+}
+
 }  // namespace esphome::epson_projector
