@@ -3,7 +3,7 @@
 #include "protocol_constants.h"
 
 #include <cstdint>
-#include <optional>
+#include <expected>
 #include <string>
 #include <variant>
 
@@ -107,24 +107,20 @@ struct StringResponse {
 
 struct AckResponse {};
 
-struct ErrorResult {
-  std::string message;
-};
-
 using ParseResult =
     std::variant<PowerResponse, LampResponse, ErrorResponse, SourceResponse, MuteResponse, VolumeResponse,
                  BrightnessResponse, ContrastResponse, ColorModeResponse, AspectRatioResponse, SharpnessResponse,
                  DensityResponse, TintResponse, ColorTempResponse, VKeystoneResponse, HKeystoneResponse,
                  HReverseResponse, VReverseResponse, LuminanceResponse, GammaResponse, FreezeResponse,
-                 SerialNumberResponse, NumericResponse, StringResponse, AckResponse, ErrorResult>;
+                 SerialNumberResponse, NumericResponse, StringResponse, AckResponse>;
 
 class ResponseParser {
  public:
-  [[nodiscard]] std::optional<ParseResult> parse(const std::string &response);
+  [[nodiscard]] std::expected<ParseResult, std::string> parse(const std::string &response);
   [[nodiscard]] bool is_complete_response(const std::string &buffer) const;
 
  private:
-  std::optional<ParseResult> parse_key_value(const std::string &key, const std::string &value);
+  std::expected<ParseResult, std::string> parse_key_value(const std::string &key, const std::string &value);
 };
 
 }  // namespace esphome::epson_projector
