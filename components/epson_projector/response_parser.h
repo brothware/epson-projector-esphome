@@ -1,9 +1,9 @@
 #pragma once
 
+#include "cpp23_compat.h"
 #include "protocol_constants.h"
 
 #include <cstdint>
-#include <expected>
 #include <string>
 #include <variant>
 
@@ -116,11 +116,11 @@ using ParseResult =
 
 class ResponseParser {
  public:
-  [[nodiscard]] std::expected<ParseResult, std::string> parse(const std::string &response);
+  [[nodiscard]] compat::expected<ParseResult, std::string> parse(const std::string &response);
   [[nodiscard]] bool is_complete_response(const std::string &buffer) const;
 
  private:
-  std::expected<ParseResult, std::string> parse_key_value(const std::string &key, const std::string &value);
+  compat::expected<ParseResult, std::string> parse_key_value(const std::string &key, const std::string &value);
 };
 
 }  // namespace esphome::epson_projector
