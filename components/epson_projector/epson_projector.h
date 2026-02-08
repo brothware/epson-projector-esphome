@@ -78,6 +78,11 @@ class EpsonProjector : public uart::UARTDevice, public PollingComponent {
     return (registered_queries_ & (1 << compat::to_underlying(type))) != 0;
   }
 
+  void mark_received(QueryType type) { received_queries_ |= (1 << compat::to_underlying(type)); }
+  [[nodiscard]] bool has_received(QueryType type) const {
+    return (received_queries_ & (1 << compat::to_underlying(type))) != 0;
+  }
+
  protected:
   void send_command(const std::string &cmd, CommandType type,
                     std::function<void(bool, const std::string &)> callback = nullptr);
@@ -120,11 +125,14 @@ class EpsonProjector : public uart::UARTDevice, public PollingComponent {
 
   uint32_t last_command_time_{0};
   static constexpr uint32_t COMMAND_DELAY_MS = 500;
+  static constexpr uint32_t INITIAL_QUERY_DELAY_MS = 50;
   static constexpr uint32_t RESPONSE_TIMEOUT_MS = 3000;
   static constexpr uint32_t BUSY_TIMEOUT_MS = 10000;
 
   std::vector<StateCallback> state_callbacks_;
   uint32_t registered_queries_{0};
+  uint32_t received_queries_{0};
+  bool initial_query_done_{false};
 };
 
 }  // namespace esphome::epson_projector

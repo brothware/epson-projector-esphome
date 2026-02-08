@@ -42,7 +42,8 @@ void EpsonProjector::loop() {
       this->last_command_time_ = now;
     }
   } else if (!this->command_queue_.empty()) {
-    if (now - this->last_command_time_ > COMMAND_DELAY_MS) {
+    uint32_t delay = this->initial_query_done_ ? COMMAND_DELAY_MS : INITIAL_QUERY_DELAY_MS;
+    if (now - this->last_command_time_ > delay) {
       this->process_queue();
     }
   }
@@ -72,6 +73,15 @@ bool EpsonProjector::is_busy_state() const {
 
 void EpsonProjector::update() {
   bool is_on = (this->power_state_ == PowerState::ON);
+
+  if (!this->initial_query_done_) {
+    bool all_received = (this->received_queries_ & this->registered_queries_) == this->registered_queries_;
+    if (all_received && this->registered_queries_ != 0) {
+      this->initial_query_done_ = true;
+      ESP_LOGD(TAG, "Initial queries complete");
+    }
+  }
+
   auto should_query = [this, is_on](const QueryInfo &info) {
     return this->has_query(info.type) && (!info.requires_power_on || is_on);
   };
@@ -343,89 +353,111 @@ void EpsonProjector::handle_response(const std::string &response) {
           ESP_LOGD(TAG, "Power state: %d -> %d", compat::to_underlying(this->power_state_),
                    compat::to_underlying(arg.state));
           this->power_state_ = arg.state;
+          this->mark_received(QueryType::POWER);
           this->notify_state_change();
         } else if constexpr (std::is_same_v<T, LampResponse>) {
           ESP_LOGD(TAG, "Lamp hours: %u", arg.hours);
           this->lamp_hours_ = arg.hours;
+          this->mark_received(QueryType::LAMP_HOURS);
           this->notify_state_change();
         } else if constexpr (std::is_same_v<T, ErrorResponse>) {
           this->error_code_ = arg.code;
+          this->mark_received(QueryType::ERROR_CODE);
           this->notify_state_change();
         } else if constexpr (std::is_same_v<T, SourceResponse>) {
           ESP_LOGD(TAG, "Source: %s", arg.source_code.c_str());
           this->current_source_ = arg.source_code;
+          this->mark_received(QueryType::SOURCE);
           this->notify_state_change();
         } else if constexpr (std::is_same_v<T, MuteResponse>) {
           ESP_LOGD(TAG, "Mute: %s", arg.muted ? "ON" : "OFF");
           this->muted_ = arg.muted;
+          this->mark_received(QueryType::MUTE);
           this->notify_state_change();
         } else if constexpr (std::is_same_v<T, VolumeResponse>) {
           ESP_LOGD(TAG, "Volume: %d", arg.value);
           this->volume_ = arg.value;
+          this->mark_received(QueryType::VOLUME);
           this->notify_state_change();
         } else if constexpr (std::is_same_v<T, BrightnessResponse>) {
           ESP_LOGD(TAG, "Brightness: %d", arg.value);
           this->brightness_ = arg.value;
+          this->mark_received(QueryType::BRIGHTNESS);
           this->notify_state_change();
         } else if constexpr (std::is_same_v<T, ContrastResponse>) {
           ESP_LOGD(TAG, "Contrast: %d", arg.value);
           this->contrast_ = arg.value;
+          this->mark_received(QueryType::CONTRAST);
           this->notify_state_change();
         } else if constexpr (std::is_same_v<T, ColorModeResponse>) {
           ESP_LOGD(TAG, "Color mode: %s", arg.mode_code.c_str());
           this->current_color_mode_ = arg.mode_code;
+          this->mark_received(QueryType::COLOR_MODE);
           this->notify_state_change();
         } else if constexpr (std::is_same_v<T, AspectRatioResponse>) {
           ESP_LOGD(TAG, "Aspect ratio: %s", arg.ratio_code.c_str());
           this->current_aspect_ratio_ = arg.ratio_code;
+          this->mark_received(QueryType::ASPECT_RATIO);
           this->notify_state_change();
         } else if constexpr (std::is_same_v<T, SharpnessResponse>) {
           ESP_LOGD(TAG, "Sharpness: %d", arg.value);
           this->sharpness_ = arg.value;
+          this->mark_received(QueryType::SHARPNESS);
           this->notify_state_change();
         } else if constexpr (std::is_same_v<T, DensityResponse>) {
           ESP_LOGD(TAG, "Density: %d", arg.value);
           this->density_ = arg.value;
+          this->mark_received(QueryType::DENSITY);
           this->notify_state_change();
         } else if constexpr (std::is_same_v<T, TintResponse>) {
           ESP_LOGD(TAG, "Tint: %d", arg.value);
           this->tint_ = arg.value;
+          this->mark_received(QueryType::TINT);
           this->notify_state_change();
         } else if constexpr (std::is_same_v<T, ColorTempResponse>) {
           ESP_LOGD(TAG, "Color temperature: %d", arg.value);
           this->color_temp_ = arg.value;
+          this->mark_received(QueryType::COLOR_TEMP);
           this->notify_state_change();
         } else if constexpr (std::is_same_v<T, VKeystoneResponse>) {
           ESP_LOGD(TAG, "V Keystone: %d", arg.value);
           this->v_keystone_ = arg.value;
+          this->mark_received(QueryType::V_KEYSTONE);
           this->notify_state_change();
         } else if constexpr (std::is_same_v<T, HKeystoneResponse>) {
           ESP_LOGD(TAG, "H Keystone: %d", arg.value);
           this->h_keystone_ = arg.value;
+          this->mark_received(QueryType::H_KEYSTONE);
           this->notify_state_change();
         } else if constexpr (std::is_same_v<T, HReverseResponse>) {
           ESP_LOGD(TAG, "H Reverse: %s", arg.reversed ? "ON" : "OFF");
           this->h_reverse_ = arg.reversed;
+          this->mark_received(QueryType::H_REVERSE);
           this->notify_state_change();
         } else if constexpr (std::is_same_v<T, VReverseResponse>) {
           ESP_LOGD(TAG, "V Reverse: %s", arg.reversed ? "ON" : "OFF");
           this->v_reverse_ = arg.reversed;
+          this->mark_received(QueryType::V_REVERSE);
           this->notify_state_change();
         } else if constexpr (std::is_same_v<T, LuminanceResponse>) {
           ESP_LOGD(TAG, "Luminance: %s", arg.mode_code.c_str());
           this->current_luminance_ = arg.mode_code;
+          this->mark_received(QueryType::LUMINANCE);
           this->notify_state_change();
         } else if constexpr (std::is_same_v<T, GammaResponse>) {
           ESP_LOGD(TAG, "Gamma: %s", arg.mode_code.c_str());
           this->current_gamma_ = arg.mode_code;
+          this->mark_received(QueryType::GAMMA);
           this->notify_state_change();
         } else if constexpr (std::is_same_v<T, FreezeResponse>) {
           ESP_LOGD(TAG, "Freeze: %s", arg.frozen ? "ON" : "OFF");
           this->frozen_ = arg.frozen;
+          this->mark_received(QueryType::FREEZE);
           this->notify_state_change();
         } else if constexpr (std::is_same_v<T, SerialNumberResponse>) {
           ESP_LOGD(TAG, "Serial Number: %s", arg.serial.c_str());
           this->serial_number_ = arg.serial;
+          this->mark_received(QueryType::SERIAL_NUMBER);
           this->notify_state_change();
         } else if constexpr (std::is_same_v<T, NumericResponse>) {
           ESP_LOGD(TAG, "Numeric response: %d", arg.value);
