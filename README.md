@@ -10,9 +10,24 @@ ESPHome external component for controlling Epson projectors via the ESC/VP21 ser
 - Volume control (0-20)
 - Lamp hours monitoring
 - Error code monitoring
-- Picture settings (brightness 0-100, contrast 0-100)
+- Serial number readout
+- Picture settings:
+  - Brightness (0-100)
+  - Contrast (0-100)
+  - Sharpness (0-15)
+  - Color saturation/density (-32 to +32)
+  - Tint/hue (-32 to +32)
+  - Color temperature (0-9)
 - Color mode selection (Dynamic, Cinema, Natural, etc.)
 - Aspect ratio selection (Normal, 4:3, 16:9, Auto, etc.)
+- Luminance/lamp mode selection (High, Low, Medium)
+- Gamma presets (2.0-2.4, Custom)
+- Geometry controls:
+  - Vertical keystone (-30 to +30)
+  - Horizontal keystone (-30 to +30)
+  - Horizontal flip/reverse
+  - Vertical flip/reverse
+- Freeze frame control
 - Model-based configuration with automatic feature detection
 - Smart polling: only configured entities trigger projector queries
 
@@ -72,6 +87,12 @@ switch:
       name: "Projector Power"
     mute:
       name: "Projector Mute"
+    h_reverse:
+      name: "Horizontal Reverse"
+    v_reverse:
+      name: "Vertical Reverse"
+    freeze:
+      name: "Freeze"
 
 binary_sensor:
   - platform: epson_projector
@@ -89,6 +110,12 @@ sensor:
     error_code:
       name: "Error Code"
 
+text_sensor:
+  - platform: epson_projector
+    projector_id: projector
+    serial_number:
+      name: "Serial Number"
+
 select:
   - platform: epson_projector
     projector_id: projector
@@ -98,6 +125,10 @@ select:
       name: "Color Mode"
     aspect_ratio:
       name: "Aspect Ratio"
+    luminance:
+      name: "Luminance"
+    gamma:
+      name: "Gamma"
 
 number:
   - platform: epson_projector
@@ -108,6 +139,18 @@ number:
       name: "Contrast"
     volume:
       name: "Volume"
+    sharpness:
+      name: "Sharpness"
+    density:
+      name: "Color Saturation"
+    tint:
+      name: "Tint"
+    color_temperature:
+      name: "Color Temperature"
+    v_keystone:
+      name: "Vertical Keystone"
+    h_keystone:
+      name: "Horizontal Keystone"
 ```
 
 ### Platform Reference
@@ -118,6 +161,9 @@ number:
 |--------|-------------|
 | `power` | Power on/off control |
 | `mute` | A/V mute control |
+| `h_reverse` | Horizontal image flip |
+| `v_reverse` | Vertical image flip |
+| `freeze` | Freeze frame |
 
 #### Binary Sensor
 
@@ -133,6 +179,12 @@ number:
 | `lamp_hours` | Lamp usage in hours |
 | `error_code` | Current error code (0 = no error) |
 
+#### Text Sensor
+
+| Entity | Description |
+|--------|-------------|
+| `serial_number` | Projector serial number |
+
 #### Select
 
 | Entity | Description |
@@ -140,6 +192,8 @@ number:
 | `source` | Input source selection (options from model config) |
 | `color_mode` | Color mode selection (Dynamic, Cinema, etc.) |
 | `aspect_ratio` | Aspect ratio selection (Normal, 4:3, 16:9, etc.) |
+| `luminance` | Lamp brightness mode (High, Low, Medium) |
+| `gamma` | Gamma preset (2.0, 2.1, 2.2, 2.3, 2.4, Custom) |
 
 #### Number
 
@@ -148,6 +202,12 @@ number:
 | `brightness` | 0-100 | Picture brightness |
 | `contrast` | 0-100 | Picture contrast |
 | `volume` | 0-20 | Audio volume |
+| `sharpness` | 0-15 | Image sharpness |
+| `density` | -32 to +32 | Color saturation |
+| `tint` | -32 to +32 | Color tint/hue |
+| `color_temperature` | 0-9 | Color temperature (warm to cool) |
+| `v_keystone` | -30 to +30 | Vertical keystone correction |
+| `h_keystone` | -30 to +30 | Horizontal keystone correction |
 
 ## Supported Models
 
@@ -225,10 +285,22 @@ This component implements the Epson ESC/VP21 protocol.
 | `VOL xx` | `VOL?` | Volume (0-20) |
 | `BRIGHT xx` | `BRIGHT?` | Brightness (0-255 raw) |
 | `CONTRAST xx` | `CONTRAST?` | Contrast (0-255 raw) |
+| `SHARP xx` | `SHARP?` | Sharpness (0-15) |
+| `DENSITY xx` | `DENSITY?` | Color saturation (-32 to +32) |
+| `TINT xx` | `TINT?` | Color tint (-32 to +32) |
+| `CTEMP xx` | `CTEMP?` | Color temperature (0-9) |
 | `CMODE xx` | `CMODE?` | Color mode (xx = mode code) |
 | `ASPECT xx` | `ASPECT?` | Aspect ratio (xx = ratio code) |
+| `LUMINANCE xx` | `LUMINANCE?` | Lamp brightness mode |
+| `GAMMA xx` | `GAMMA?` | Gamma preset |
+| `VKEYSTONE xx` | `VKEYSTONE?` | Vertical keystone (-30 to +30) |
+| `HKEYSTONE xx` | `HKEYSTONE?` | Horizontal keystone (-30 to +30) |
+| `HREVERSE ON/OFF` | `HREVERSE?` | Horizontal image flip |
+| `VREVERSE ON/OFF` | `VREVERSE?` | Vertical image flip |
+| `FREEZE ON/OFF` | `FREEZE?` | Freeze frame |
 | - | `LAMP?` | Lamp hours |
 | - | `ERR?` | Error code |
+| - | `SNO?` | Serial number |
 
 ### Power States
 
@@ -284,6 +356,25 @@ This component implements the Epson ESC/VP21 protocol.
 | 60 | Native |
 | 70 | Wide |
 | 80 | Anamorphic |
+
+### Luminance Codes
+
+| Code | Mode |
+|------|------|
+| 00 | High |
+| 01 | Low |
+| 02 | Medium |
+
+### Gamma Codes
+
+| Code | Preset |
+|------|--------|
+| 20 | 2.0 |
+| 21 | 2.1 |
+| 22 | 2.2 |
+| 23 | 2.3 |
+| 24 | 2.4 |
+| F0 | Custom |
 
 ## Smart Polling
 
