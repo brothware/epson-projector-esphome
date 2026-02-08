@@ -39,5 +39,6 @@ async def to_code(config):
     for key, switch_type in SWITCH_TYPES.items():
         if conf := config.get(key):
             sw = await switch.new_switch(conf)
+            await cg.register_component(sw, conf)
             cg.add(sw.set_parent(parent))
             cg.add(sw.set_switch_type(switch_type))

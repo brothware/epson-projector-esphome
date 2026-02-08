@@ -71,5 +71,6 @@ async def to_code(config):
                 max_value=ranges["max"],
                 step=1,
             )
+            await cg.register_component(num, conf)
             cg.add(num.set_parent(parent))
             cg.add(num.set_number_type(number_type))

@@ -40,5 +40,6 @@ async def to_code(config):
     for key, sensor_type in SENSOR_TYPES.items():
         if conf := config.get(key):
             sens = await binary_sensor.new_binary_sensor(conf)
+            await cg.register_component(sens, conf)
             cg.add(sens.set_parent(parent))
             cg.add(sens.set_sensor_type(sensor_type))

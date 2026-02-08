@@ -52,5 +52,6 @@ async def to_code(config):
     for key, select_type in SELECT_TYPES.items():
         if conf := config.get(key):
             sel = await select.new_select(conf, options=[])
+            await cg.register_component(sel, conf)
             cg.add(sel.set_parent(parent))
             cg.add(sel.set_select_type(select_type))
