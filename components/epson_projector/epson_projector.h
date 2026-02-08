@@ -41,6 +41,7 @@ class EpsonProjector : public uart::UARTDevice, public PollingComponent {
   void set_v_reverse(bool reverse);
   void set_luminance(const std::string &mode_code);
   void set_gamma(const std::string &mode_code);
+  void set_freeze(bool freeze);
 
   void query_power();
   void query_lamp_hours();
@@ -62,6 +63,8 @@ class EpsonProjector : public uart::UARTDevice, public PollingComponent {
   void query_v_reverse();
   void query_luminance();
   void query_gamma();
+  void query_freeze();
+  void query_serial_number();
 
   [[nodiscard]] PowerState power_state() const { return power_state_; }
   [[nodiscard]] bool is_muted() const { return muted_; }
@@ -83,6 +86,8 @@ class EpsonProjector : public uart::UARTDevice, public PollingComponent {
   [[nodiscard]] bool v_reverse() const { return v_reverse_; }
   [[nodiscard]] const std::string &current_luminance() const { return current_luminance_; }
   [[nodiscard]] const std::string &current_gamma() const { return current_gamma_; }
+  [[nodiscard]] bool is_frozen() const { return frozen_; }
+  [[nodiscard]] const std::string &serial_number() const { return serial_number_; }
 
   using StateCallback = std::function<void()>;
   void add_on_state_callback(StateCallback callback) { state_callbacks_.push_back(std::move(callback)); }
@@ -108,6 +113,8 @@ class EpsonProjector : public uart::UARTDevice, public PollingComponent {
     V_REVERSE,
     LUMINANCE,
     GAMMA,
+    FREEZE,
+    SERIAL_NUMBER,
   };
   void register_query(QueryType type) { registered_queries_ |= (1 << static_cast<uint16_t>(type)); }
   bool has_query(QueryType type) const { return (registered_queries_ & (1 << static_cast<uint16_t>(type))) != 0; }
@@ -145,6 +152,8 @@ class EpsonProjector : public uart::UARTDevice, public PollingComponent {
   bool v_reverse_{false};
   std::string current_luminance_;
   std::string current_gamma_;
+  bool frozen_{false};
+  std::string serial_number_;
 
   uint32_t last_command_time_{0};
   static constexpr uint32_t COMMAND_DELAY_MS = 500;

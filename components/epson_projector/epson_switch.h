@@ -13,6 +13,7 @@ enum class SwitchType : uint8_t {
   MUTE,
   H_REVERSE,
   V_REVERSE,
+  FREEZE,
 };
 
 class EpsonSwitch : public switch_::Switch, public Component, public Parented<EpsonProjector> {

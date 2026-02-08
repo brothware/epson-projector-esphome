@@ -32,6 +32,7 @@ static constexpr const char *CMD_HKEYSTONE = "HKEYSTONE";
 static constexpr const char *CMD_ASPECT = "ASPECT";
 static constexpr const char *CMD_HREVERSE = "HREVERSE";
 static constexpr const char *CMD_VREVERSE = "VREVERSE";
+static constexpr const char *CMD_FREEZE = "FREEZE";
 
 static constexpr const char *ARG_ON = "ON";
 static constexpr const char *ARG_OFF = "OFF";

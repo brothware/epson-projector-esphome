@@ -23,6 +23,9 @@ void EpsonSwitch::setup() {
     case SwitchType::V_REVERSE:
       this->parent_->register_query(EpsonProjector::QueryType::V_REVERSE);
       break;
+    case SwitchType::FREEZE:
+      this->parent_->register_query(EpsonProjector::QueryType::FREEZE);
+      break;
   }
 }
 
@@ -42,6 +45,9 @@ void EpsonSwitch::dump_config() {
     case SwitchType::V_REVERSE:
       type_str = "V Reverse";
       break;
+    case SwitchType::FREEZE:
+      type_str = "Freeze";
+      break;
   }
   ESP_LOGCONFIG(TAG, "  Type: %s", type_str);
 }
@@ -60,6 +66,9 @@ void EpsonSwitch::write_state(bool state) {
     case SwitchType::V_REVERSE:
       this->parent_->set_v_reverse(state);
       break;
+    case SwitchType::FREEZE:
+      this->parent_->set_freeze(state);
+      break;
   }
 }
 
@@ -77,6 +86,9 @@ void EpsonSwitch::on_state_change() {
       break;
     case SwitchType::V_REVERSE:
       state = this->parent_->v_reverse();
+      break;
+    case SwitchType::FREEZE:
+      state = this->parent_->is_frozen();
       break;
   }
   this->publish_state(state);

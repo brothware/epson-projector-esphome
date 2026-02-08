@@ -89,6 +89,14 @@ struct GammaResponse {
   std::string mode_code;
 };
 
+struct FreezeResponse {
+  bool frozen;
+};
+
+struct SerialNumberResponse {
+  std::string serial;
+};
+
 struct NumericResponse {
   int value;
 };
@@ -107,8 +115,8 @@ using ParseResult =
     std::variant<PowerResponse, LampResponse, ErrorResponse, SourceResponse, MuteResponse, VolumeResponse,
                  BrightnessResponse, ContrastResponse, ColorModeResponse, AspectRatioResponse, SharpnessResponse,
                  DensityResponse, TintResponse, ColorTempResponse, VKeystoneResponse, HKeystoneResponse,
-                 HReverseResponse, VReverseResponse, LuminanceResponse, GammaResponse, NumericResponse, StringResponse,
-                 AckResponse, ErrorResult>;
+                 HReverseResponse, VReverseResponse, LuminanceResponse, GammaResponse, FreezeResponse,
+                 SerialNumberResponse, NumericResponse, StringResponse, AckResponse, ErrorResult>;
 
 class ResponseParser {
  public:

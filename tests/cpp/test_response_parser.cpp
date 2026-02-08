@@ -266,4 +266,28 @@ TEST_F(ResponseParserTest, ParsesGammaCustom) {
   EXPECT_EQ(gamma->mode_code, "F0");
 }
 
+TEST_F(ResponseParserTest, ParsesFreezeOn) {
+  auto result = parser.parse("FREEZE=ON\r:");
+  ASSERT_TRUE(result.has_value());
+  auto *freeze = std::get_if<FreezeResponse>(&*result);
+  ASSERT_NE(freeze, nullptr);
+  EXPECT_TRUE(freeze->frozen);
+}
+
+TEST_F(ResponseParserTest, ParsesFreezeOff) {
+  auto result = parser.parse("FREEZE=OFF\r:");
+  ASSERT_TRUE(result.has_value());
+  auto *freeze = std::get_if<FreezeResponse>(&*result);
+  ASSERT_NE(freeze, nullptr);
+  EXPECT_FALSE(freeze->frozen);
+}
+
+TEST_F(ResponseParserTest, ParsesSerialNumber) {
+  auto result = parser.parse("SNO=ABC123456\r:");
+  ASSERT_TRUE(result.has_value());
+  auto *sno = std::get_if<SerialNumberResponse>(&*result);
+  ASSERT_NE(sno, nullptr);
+  EXPECT_EQ(sno->serial, "ABC123456");
+}
+
 }  // namespace esphome::epson_projector

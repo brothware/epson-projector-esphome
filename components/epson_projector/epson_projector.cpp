@@ -129,6 +129,12 @@ void EpsonProjector::update() {
     if (this->has_query(QueryType::GAMMA)) {
       this->query_gamma();
     }
+    if (this->has_query(QueryType::FREEZE)) {
+      this->query_freeze();
+    }
+    if (this->has_query(QueryType::SERIAL_NUMBER)) {
+      this->query_serial_number();
+    }
   }
 }
 
@@ -336,6 +342,16 @@ void EpsonProjector::set_gamma(const std::string &mode_code) {
   });
 }
 
+void EpsonProjector::set_freeze(bool freeze) {
+  std::string cmd = build_set_command(CMD_FREEZE, freeze ? ARG_ON : ARG_OFF);
+  this->send_command(cmd, CommandType::SET, [this, freeze](bool success, const std::string &) {
+    if (success) {
+      this->frozen_ = freeze;
+      this->notify_state_change();
+    }
+  });
+}
+
 void EpsonProjector::query_power() {
   std::string cmd = build_query_command(CMD_POWER);
   this->send_command(cmd, CommandType::QUERY);
@@ -433,6 +449,16 @@ void EpsonProjector::query_luminance() {
 
 void EpsonProjector::query_gamma() {
   std::string cmd = build_query_command(CMD_GAMMA);
+  this->send_command(cmd, CommandType::QUERY);
+}
+
+void EpsonProjector::query_freeze() {
+  std::string cmd = build_query_command(CMD_FREEZE);
+  this->send_command(cmd, CommandType::QUERY);
+}
+
+void EpsonProjector::query_serial_number() {
+  std::string cmd = build_query_command(CMD_SERIAL);
   this->send_command(cmd, CommandType::QUERY);
 }
 
@@ -547,6 +573,14 @@ void EpsonProjector::handle_response(const std::string &response) {
         } else if constexpr (std::is_same_v<T, GammaResponse>) {
           ESP_LOGD(TAG, "Gamma: %s", arg.mode_code.c_str());
           this->current_gamma_ = arg.mode_code;
+          this->notify_state_change();
+        } else if constexpr (std::is_same_v<T, FreezeResponse>) {
+          ESP_LOGD(TAG, "Freeze: %s", arg.frozen ? "ON" : "OFF");
+          this->frozen_ = arg.frozen;
+          this->notify_state_change();
+        } else if constexpr (std::is_same_v<T, SerialNumberResponse>) {
+          ESP_LOGD(TAG, "Serial Number: %s", arg.serial.c_str());
+          this->serial_number_ = arg.serial;
           this->notify_state_change();
         } else if constexpr (std::is_same_v<T, NumericResponse>) {
           ESP_LOGD(TAG, "Numeric response: %d", arg.value);

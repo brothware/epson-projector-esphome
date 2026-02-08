@@ -54,6 +54,14 @@ switch:
       name: "Horizontal Reverse"
     v_reverse:
       name: "Vertical Reverse"
+    freeze:
+      name: "Freeze"
+
+text_sensor:
+  - platform: epson_projector
+    projector_id: projector
+    serial_number:
+      name: "Serial Number"
 
 binary_sensor:
   - platform: epson_projector

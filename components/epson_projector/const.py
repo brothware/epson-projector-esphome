@@ -22,6 +22,8 @@ CONF_H_REVERSE = "h_reverse"
 CONF_V_REVERSE = "v_reverse"
 CONF_LUMINANCE = "luminance"
 CONF_GAMMA = "gamma"
+CONF_FREEZE = "freeze"
+CONF_SERIAL_NUMBER = "serial_number"
 
 ICON_PROJECTOR = "mdi:projector"
 ICON_LAMP = "mdi:lightbulb-on"
@@ -43,6 +45,8 @@ ICON_H_REVERSE = "mdi:flip-horizontal"
 ICON_V_REVERSE = "mdi:flip-vertical"
 ICON_LUMINANCE = "mdi:brightness-auto"
 ICON_GAMMA = "mdi:gamma"
+ICON_FREEZE = "mdi:pause"
+ICON_SERIAL_NUMBER = "mdi:identifier"
 
 BRIGHTNESS_MIN = 0
 BRIGHTNESS_MAX = 100

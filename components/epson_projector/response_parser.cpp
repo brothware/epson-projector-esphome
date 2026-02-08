@@ -143,6 +143,14 @@ std::optional<ParseResult> ResponseParser::parse_key_value(const std::string &ke
     return GammaResponse{value};
   }
 
+  if (key == CMD_FREEZE) {
+    return FreezeResponse{value == ARG_ON || value == "01"};
+  }
+
+  if (key == CMD_SERIAL) {
+    return SerialNumberResponse{value};
+  }
+
   return StringResponse{value};
 }
 

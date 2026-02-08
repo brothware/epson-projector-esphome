@@ -5,10 +5,12 @@ from esphome.const import DEVICE_CLASS_SWITCH, ENTITY_CATEGORY_CONFIG
 
 from . import epson_projector_ns
 from .const import (
+    CONF_FREEZE,
     CONF_H_REVERSE,
     CONF_MUTE,
     CONF_POWER,
     CONF_V_REVERSE,
+    ICON_FREEZE,
     ICON_H_REVERSE,
     ICON_MUTE,
     ICON_PROJECTOR,
@@ -26,6 +28,7 @@ SWITCH_TYPES = {
     CONF_MUTE: SwitchType.MUTE,
     CONF_H_REVERSE: SwitchType.H_REVERSE,
     CONF_V_REVERSE: SwitchType.V_REVERSE,
+    CONF_FREEZE: SwitchType.FREEZE,
 }
 
 CONFIG_SCHEMA = projector_platform_schema(
@@ -48,6 +51,11 @@ CONFIG_SCHEMA = projector_platform_schema(
         cv.Optional(CONF_V_REVERSE): switch.switch_schema(
             EpsonSwitch,
             icon=ICON_V_REVERSE,
+            entity_category=ENTITY_CATEGORY_CONFIG,
+        ),
+        cv.Optional(CONF_FREEZE): switch.switch_schema(
+            EpsonSwitch,
+            icon=ICON_FREEZE,
             entity_category=ENTITY_CATEGORY_CONFIG,
         ),
     }
