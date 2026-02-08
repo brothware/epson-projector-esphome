@@ -194,9 +194,10 @@ void EpsonProjector::process_queue() {
 void EpsonProjector::handle_response(const std::string &response) {
   auto result = this->response_parser_.parse(response);
   if (!result.has_value()) {
-    ESP_LOGW(TAG, "Failed to parse response");
+    ESP_LOGW(TAG, "Failed to parse response: %s", response.c_str());
     return;
   }
+  ESP_LOGD(TAG, "Parsed response successfully");
 
   bool success = true;
   auto &pending = this->command_queue_.pending_command();
