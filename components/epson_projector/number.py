@@ -3,7 +3,7 @@ import esphome.config_validation as cv
 from esphome.components import number
 from esphome.const import CONF_MODE, ENTITY_CATEGORY_CONFIG
 
-from . import epson_projector_ns
+from . import _filter_platform_sources, epson_projector_ns
 from .const import (
     BRIGHTNESS_MAX,
     BRIGHTNESS_MIN,
@@ -45,6 +45,7 @@ from .const import (
 from .platform_helpers import get_projector_parent, projector_platform_schema
 
 DEPENDENCIES = ["epson_projector"]
+FILTER_SOURCE_FILES = _filter_platform_sources
 
 EpsonNumber = epson_projector_ns.class_("EpsonNumber", number.Number, cg.Component)
 NumberType = epson_projector_ns.enum("NumberType", is_class=True)

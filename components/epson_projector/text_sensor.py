@@ -3,11 +3,12 @@ import esphome.config_validation as cv
 from esphome.components import text_sensor
 from esphome.const import ENTITY_CATEGORY_DIAGNOSTIC
 
-from . import epson_projector_ns
+from . import _filter_platform_sources, epson_projector_ns
 from .const import CONF_SERIAL_NUMBER, ICON_SERIAL_NUMBER
 from .platform_helpers import get_projector_parent, projector_platform_schema
 
 DEPENDENCIES = ["epson_projector"]
+FILTER_SOURCE_FILES = _filter_platform_sources
 
 EpsonTextSensor = epson_projector_ns.class_("EpsonTextSensor", text_sensor.TextSensor, cg.Component)
 TextSensorType = epson_projector_ns.enum("TextSensorType", is_class=True)

@@ -3,7 +3,7 @@ import esphome.config_validation as cv
 from esphome.components import switch
 from esphome.const import DEVICE_CLASS_SWITCH, ENTITY_CATEGORY_CONFIG
 
-from . import epson_projector_ns
+from . import _filter_platform_sources, epson_projector_ns
 from .const import (
     CONF_FREEZE,
     CONF_H_REVERSE,
@@ -19,6 +19,7 @@ from .const import (
 from .platform_helpers import get_projector_parent, projector_platform_schema
 
 DEPENDENCIES = ["epson_projector"]
+FILTER_SOURCE_FILES = _filter_platform_sources
 
 EpsonSwitch = epson_projector_ns.class_("EpsonSwitch", switch.Switch, cg.Component)
 SwitchType = epson_projector_ns.enum("SwitchType", is_class=True)
