@@ -2,6 +2,7 @@ import esphome.codegen as cg
 import esphome.config_validation as cv
 from esphome.components import uart
 from esphome.const import CONF_ID, CONF_UPDATE_INTERVAL
+from esphome.core import CORE
 
 from .const import CONF_MODEL
 from .models import get_model_names
@@ -26,8 +27,6 @@ CONFIG_SCHEMA = (
 
 
 def _filter_platform_sources() -> list[str]:
-    from esphome.core import CORE
-
     platform_files = {
         "number": ["epson_number.cpp", "epson_number.h"],
         "select": ["epson_select.cpp", "epson_select.h"],
