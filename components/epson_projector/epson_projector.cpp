@@ -72,7 +72,7 @@ bool EpsonProjector::is_busy_state() const {
 }
 
 void EpsonProjector::update() {
-  bool is_on = (this->power_state_ == PowerState::ON);
+  bool is_on = (this->power_state_ == PowerState::ON || this->power_state_ == PowerState::WARMUP);
 
   if (!this->initial_query_done_) {
     bool all_received = (this->received_queries_ & this->registered_queries_) == this->registered_queries_;

@@ -32,7 +32,7 @@ void EpsonBinarySensor::on_state_change() {
   bool state = false;
   switch (this->sensor_type_) {
     case BinarySensorType::POWER_STATE:
-      state = this->parent_->power_state() == PowerState::ON;
+      state = this->parent_->power_state() == PowerState::ON || this->parent_->power_state() == PowerState::WARMUP;
       break;
     case BinarySensorType::MUTE_STATE:
       state = this->parent_->is_muted();
