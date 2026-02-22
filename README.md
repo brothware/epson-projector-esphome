@@ -23,7 +23,7 @@ ESPHome external component for controlling Epson projectors via the ESC/VP21 ser
 
 ```yaml
 external_components:
-  - source: github://brothware/epson-projector-esphome@v1.0.0
+  - source: github://brothware/epson-projector-esphome@v1.0.1
     components:
       - epson_projector
 
