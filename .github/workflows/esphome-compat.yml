@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       latest_version: ${{ steps.get-version.outputs.version }}
-      version_changed: ${{ steps.check-cache.outputs.changed }}
+      version_changed: ${{ steps.check-changed.outputs.changed }}
     steps:
       - name: Get latest ESPHome version
         id: get-version
@@ -28,6 +28,7 @@ jobs:
           key: esphome-version-${{ steps.get-version.outputs.version }}
 
       - name: Mark as changed if cache miss
+        id: check-changed
         if: steps.check-cache.outputs.cache-hit != 'true'
         run: |
           echo "${{ steps.get-version.outputs.version }}" > .esphome-version
