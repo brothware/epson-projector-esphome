@@ -43,6 +43,9 @@ jobs:
         esphome-version:
           - latest
           - beta
+        config:
+          - test_config.yaml
+          - test_minimal.yaml
     steps:
       - uses: actions/checkout@v4
 
@@ -52,14 +55,14 @@ jobs:
           path: |
             ~/.platformio
             tests/esphome/.esphome
-          key: pio-compat-${{ matrix.esphome-version }}-${{ hashFiles('tests/esphome/test_config.yaml') }}
+          key: pio-compat-${{ matrix.esphome-version }}-${{ matrix.config }}-${{ hashFiles('tests/esphome/*.yaml') }}
           restore-keys: |
-            pio-compat-${{ matrix.esphome-version }}-
+            pio-compat-${{ matrix.esphome-version }}-${{ matrix.config }}-
 
-      - name: Build with ESPHome ${{ matrix.esphome-version }}
+      - name: Build ${{ matrix.config }} with ESPHome ${{ matrix.esphome-version }}
         uses: esphome/build-action@v6
         with:
-          yaml-file: tests/esphome/test_config.yaml
+          yaml-file: tests/esphome/${{ matrix.config }}
           version: ${{ matrix.esphome-version }}
 
   notify-on-failure:

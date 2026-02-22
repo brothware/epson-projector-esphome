@@ -53,6 +53,12 @@ jobs:
   build:
     runs-on: ubuntu-latest
     needs: [lint-cpp, lint-python, lint-yaml]
+    strategy:
+      fail-fast: false
+      matrix:
+        config:
+          - test_config.yaml
+          - test_minimal.yaml
     steps:
       - uses: actions/checkout@v4
 
@@ -62,12 +68,12 @@ jobs:
           path: |
             ~/.platformio
             tests/esphome/.esphome
-          key: platformio-${{ hashFiles('tests/esphome/test_config.yaml') }}
+          key: platformio-${{ matrix.config }}-${{ hashFiles(format('tests/esphome/{0}', matrix.config)) }}
           restore-keys: |
-            platformio-
+            platformio-${{ matrix.config }}-
 
-      - name: Build with ESPHome
+      - name: Build ${{ matrix.config }} with ESPHome
         uses: esphome/build-action@v6
         with:
-          yaml-file: tests/esphome/test_config.yaml
+          yaml-file: tests/esphome/${{ matrix.config }}
           version: latest
