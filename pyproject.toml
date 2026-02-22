@@ -33,7 +33,7 @@ target-version = "py311"
 
 [tool.ruff.lint]
 select = ["E", "F", "W", "I", "UP", "PL", "B", "SIM"]
-ignore = ["PLR0913", "PLR2004", "PLC0415"]
+ignore = []
 
 [tool.ruff.lint.isort]
 known-first-party = ["epson_projector"]
